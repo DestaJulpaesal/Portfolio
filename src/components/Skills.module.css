@@ -1,0 +1,180 @@
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.number {
+  color: var(--text-faint);
+}
+
+.heading {
+  font-size: clamp(1.7rem, 3.2vw, 2.3rem);
+  margin-bottom: 40px;
+  max-width: 560px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 10px;
+  position: sticky;
+  top: 88px;
+}
+
+.sidebarItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  text-align: left;
+}
+
+.sidebarItem:hover {
+  color: var(--text);
+  background: var(--bg-panel-alt);
+}
+
+.sidebarItemActive {
+  color: var(--text);
+  background: var(--accent-soft);
+  border-color: var(--border-strong);
+}
+
+.sidebarItemLabel {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.sidebarItemLabel svg {
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.sidebarItemActive .sidebarItemLabel svg {
+  color: var(--accent);
+}
+
+.sidebarItemMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sidebarItemCount {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.sidebarItemChevron {
+  color: var(--text-faint);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.sidebarItemActive .sidebarItemChevron {
+  color: var(--accent);
+  transform: translateX(2px);
+}
+
+.panel {
+  min-height: 230px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px 12px;
+  transition: border-color 0.2s ease;
+}
+
+.badge:hover {
+  border-color: var(--border-strong);
+}
+
+.badge span {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.note {
+  margin-top: 28px;
+  font-size: 12.5px;
+  color: var(--text-faint);
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    flex-direction: row;
+    overflow-x: auto;
+    position: static;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    /* Fade tipis di kedua ujung sidebar — sinyal visual halus bahwa
+       daftar kategori ini bisa di-scroll ke samping di HP. */
+    mask-image: linear-gradient(90deg, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
+  }
+  .sidebarItem {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .panel {
+    padding: 16px;
+  }
+}

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0c10" />
+
+    <title>Desta Julpaesal — Informatics Student & Web Developer</title>
+    <meta
+      name="description"
+      content="Portofolio Desta Julpaesal, mahasiswa Teknik Informatika UNIKOM & web developer. Membangun sistem dan solusi web modern, terstruktur, dan mudah digunakan."
+    />
+    <meta name="author" content="Desta Julpaesal" />
+
+    <!-- Open Graph — preview link pas di-share ke WhatsApp, Instagram, Facebook, dll -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Desta Julpaesal — Portfolio" />
+    <meta property="og:title" content="Desta Julpaesal — Informatics Student & Web Developer" />
+    <meta
+      property="og:description"
+      content="Portofolio Desta Julpaesal, mahasiswa Teknik Informatika UNIKOM & web developer. Membangun sistem dan solusi web modern, terstruktur, dan mudah digunakan."
+    />
+    <meta property="og:image" content="/projects/hero.jpg" />
+    <meta property="og:locale" content="id_ID" />
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Desta Julpaesal — Informatics Student & Web Developer" />
+    <meta
+      name="twitter:description"
+      content="Portofolio Desta Julpaesal, mahasiswa Teknik Informatika UNIKOM & web developer."
+    />
+    <meta name="twitter:image" content="/projects/hero.jpg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("portfolio-theme");
+          var theme =
+            saved === "dark" || saved === "light"
+              ? saved
+              : window.matchMedia("(prefers-color-scheme: light)").matches
+              ? "light"
+              : "dark";
+          document.documentElement.setAttribute("data-theme", theme);
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

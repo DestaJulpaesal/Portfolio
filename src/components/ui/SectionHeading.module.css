@@ -1,0 +1,30 @@
+.wrap {
+  margin-bottom: 44px;
+  max-width: 560px;
+}
+
+.center {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.number {
+  color: var(--text-faint);
+}
+
+.title {
+  font-size: clamp(1.7rem, 3.2vw, 2.3rem);
+  color: var(--text);
+}

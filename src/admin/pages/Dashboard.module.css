@@ -1,0 +1,132 @@
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  padding: 40px 0;
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.statCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: 0 14px 30px -28px rgba(0, 0, 0, 0.8);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 34px -28px rgba(0, 0, 0, 0.9);
+  border-color: var(--border-strong);
+  background: var(--bg-panel-alt);
+}
+
+.statIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.iconBlue {
+  background: var(--accent-2-soft);
+  color: var(--accent-2-color);
+}
+
+.iconGreen {
+  background: rgba(74, 222, 128, 0.12);
+  color: #4ade80;
+}
+
+.iconGold {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.iconPink {
+  background: rgba(244, 114, 182, 0.12);
+  color: #f472b6;
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 5px 0 0;
+}
+
+.quickLinks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.quickLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  text-decoration: none;
+  color: var(--text);
+  box-shadow: 0 14px 32px -28px rgba(0, 0, 0, 0.8);
+  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.quickLink:hover {
+  border-color: var(--accent-2-color);
+  background: var(--bg-panel-alt);
+  transform: translateY(-3px);
+}
+
+.quickLink strong {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.quickLink p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  max-width: 320px;
+}
+
+.quickLink svg {
+  color: var(--text-faint);
+  flex-shrink: 0;
+}

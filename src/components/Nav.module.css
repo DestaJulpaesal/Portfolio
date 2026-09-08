@@ -1,0 +1,198 @@
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 50;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  border-bottom: 1px solid transparent;
+  background: rgba(var(--bg-rgb), 0.48);
+  backdrop-filter: blur(10px);
+}
+
+:global(.publicMain) {
+  padding-top: clamp(64px, 7vw, 76px);
+}
+
+.progressBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-2), var(--accent));
+  z-index: 51;
+  transition: width 0.1s linear;
+}
+
+.scrolled {
+  backdrop-filter: blur(14px);
+  background: rgba(var(--bg-rgb), 0.78);
+  border-bottom: 1px solid var(--border-strong);
+  box-shadow: 0 14px 30px -24px rgba(0, 0, 0, 0.8);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: clamp(64px, 7vw, 76px);
+  gap: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.mark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.markIcon {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.mark:hover .markIcon {
+  transform: scale(1.06);
+}
+
+.markImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  filter: none;
+  transition: filter 0.3s ease;
+}
+
+/* Logo aslinya monokrom hitam — di dark mode di-invert jadi putih
+   supaya tetap kelihatan tanpa perlu kotak background warna. */
+[data-theme="dark"] .markImg {
+  filter: invert(1) brightness(1.2) drop-shadow(0 2px 6px rgba(255, 255, 255, 0.12));
+}
+
+.links {
+  display: flex;
+  gap: clamp(16px, 2.2vw, 26px);
+  flex-wrap: nowrap;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(var(--bg-rgb), 0.36);
+}
+
+.link {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 0%;
+  height: 1.5px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2-color));
+  transition: width 0.3s var(--ease-premium);
+}
+
+.link:hover {
+  color: var(--text);
+}
+
+.link:hover::after {
+  width: 100%;
+}
+
+/* Section aktif (hasil scroll-spy) — tetap menyala tanpa perlu hover,
+   supaya user selalu tahu sedang di bagian mana halaman. */
+.linkActive {
+  color: var(--accent-2);
+}
+
+.linkActive::after {
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.themeToggleGap {
+  margin-right: 2px;
+}
+
+.cta {
+  flex-shrink: 0;
+}
+
+.burger {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  padding: 6px;
+}
+
+.mobileMenu {
+  display: none;
+}
+
+@media (max-width: 1000px) {
+  .links {
+    display: none;
+  }
+  .cta {
+    display: none;
+  }
+  .burger {
+    display: flex;
+  }
+  .mobileMenu {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 20px 20px;
+    background: rgba(var(--bg-rgb), 0.98);
+    border-bottom: 1px solid var(--border);
+  }
+  .mobileLink {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 15px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    transition: color 0.2s ease;
+  }
+  .mobileLink:last-of-type {
+    border-bottom: none;
+  }
+  .mobileLinkActive {
+    color: var(--accent);
+  }
+  .mobileCtaRow {
+    padding-top: 16px;
+  }
+  .mobileCta {
+    width: 100%;
+    justify-content: center;
+  }
+}

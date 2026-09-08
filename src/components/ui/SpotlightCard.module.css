@@ -1,0 +1,38 @@
+.card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  --mx: 50%;
+  --my: 50%;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-soft);
+  box-shadow: 0 22px 44px -28px rgba(0, 0, 0, 0.85);
+}
+
+.spotlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(
+    280px circle at var(--mx) var(--my),
+    var(--accent-soft),
+    transparent 70%
+  );
+}
+
+.card:hover .spotlight {
+  opacity: 1;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+}

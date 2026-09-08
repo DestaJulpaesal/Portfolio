@@ -1,0 +1,24 @@
+/* Reset & base kecil khusus area /admin — situs publik (index.css) tidak
+   diimpor di sini supaya style keduanya tidak saling bentrok. */
+
+.admin-root,
+.admin-root * {
+  box-sizing: border-box;
+}
+
+.admin-root {
+  font-family: var(--font-body);
+  color: var(--text);
+}
+
+.admin-root ::selection {
+  background: var(--accent-2-soft);
+}
+
+.admin-root button {
+  font-family: inherit;
+}
+
+.admin-root a {
+  color: inherit;
+}

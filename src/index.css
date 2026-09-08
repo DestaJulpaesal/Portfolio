@@ -1,0 +1,438 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap');
+
+:root,
+[data-theme="dark"] {
+  --bg: #0b1010;
+  --bg-rgb: 11, 16, 16;
+  --bg-panel: #121b1a;
+  --bg-panel-alt: #182321;
+  --text: #f3f0ee;
+  --text-muted: #a19cad;
+  --text-faint: #625d6d;
+  --border: rgba(243, 240, 238, 0.08);
+  --border-strong: rgba(243, 240, 238, 0.16);
+  --accent: #d9854a;
+  --accent-2: #e0a06f;
+  --accent-soft: rgba(217, 133, 74, 0.15);
+  --accent-2-soft: rgba(217, 133, 74, 0.1);
+  --accent-2-color: #e0a06f;
+  --grid-line: rgba(243, 240, 238, 0.06);
+  --grid-fade: #0c0a0d;
+
+  --font-display: "Playfair Display", "Iowan Old Style", serif;
+  --font-body: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "DM Mono", "SFMono-Regular", Consolas, monospace;
+
+  --max-width: 1160px;
+  --radius-sm: 8px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+
+  --shadow-sm: 0 6px 16px -8px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 16px 32px -14px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 30px 60px -24px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 12px 28px -10px var(--accent-soft);
+
+  /* Kurva easing "premium" — dipakai konsisten di semua transisi/reveal
+     supaya gerakannya berasa satu bahasa desain dari header sampai footer. */
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --bg: #f5f4ef;
+  --bg-rgb: 245, 244, 239;
+  --bg-panel: #fffefa;
+  --bg-panel-alt: #e9efeb;
+  --text: #1d1a1f;
+  --text-muted: #5f5a66;
+  --text-faint: #8d8792;
+  --border: rgba(29, 26, 31, 0.09);
+  --border-strong: rgba(29, 26, 31, 0.16);
+  --accent: #a95729;
+  --accent-2: #c87948;
+  --accent-soft: rgba(184, 102, 43, 0.12);
+  --accent-2-soft: rgba(169, 87, 41, 0.1);
+  --accent-2-color: #c87948;
+  --grid-line: rgba(29, 26, 31, 0.06);
+  --grid-fade: #f8f5f1;
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* Grid halus ala kertas milimeter, hanya di belakang hero — memudar ke tepi supaya tidak mencolok.
+   Sengaja "absolute" (bukan fixed) supaya grid ini tetap menempel di area atas halaman dan
+   ikut ter-scroll keluar layar, tidak muncul lagi mengikuti scroll di section bawah (mis. Contact/Footer). */
+.gridBackdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  min-height: 640px;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 44px 44px;
+  opacity: 0.8;
+  -webkit-mask-image: radial-gradient(ellipse 65% 55% at 50% 32%, #000 0%, transparent 75%);
+  mask-image: radial-gradient(ellipse 65% 55% at 50% 32%, #000 0%, transparent 75%);
+  transition: background-image 0.4s ease;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(circle at 78% 8%, var(--accent-soft), transparent 25%),
+    radial-gradient(circle at 8% 48%, var(--accent-2-soft), transparent 22%);
+  opacity: 0.55;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.pageLoading {
+  min-height: 100svh;
+  padding: 0 max(20px, 4vw);
+}
+
+.pageLoadingHeader {
+  height: 72px;
+  border-bottom: 1px solid var(--border);
+}
+
+.pageLoadingBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr);
+  gap: clamp(32px, 7vw, 88px);
+  align-items: center;
+  max-width: var(--max-width);
+  min-height: calc(100svh - 72px);
+  margin: 0 auto;
+}
+
+.pageLoadingCopy,
+.pageLoadingVisual {
+  border-radius: var(--radius-lg);
+  background: linear-gradient(100deg, var(--bg-panel) 20%, var(--bg-panel-alt) 45%, var(--bg-panel) 70%);
+  background-size: 220% 100%;
+  animation: loadingShimmer 1.8s ease-in-out infinite;
+}
+
+.pageLoadingCopy {
+  width: min(100%, 520px);
+  height: 210px;
+}
+
+.pageLoadingVisual {
+  width: min(100%, 360px);
+  height: 420px;
+  justify-self: center;
+}
+
+@keyframes loadingShimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+section {
+  position: relative;
+  z-index: 1;
+  padding: 96px 0;
+}
+
+/* Alih-alih garis solid tegas antar-section, pakai divider gradient tipis
+   yang memudar di kedua ujung — transisi antar-blok jadi terasa lebih
+   menyatu/"mengalir" daripada dipotong garis keras. */
+section:not(:last-of-type)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--border-strong) 20%,
+    var(--border-strong) 80%,
+    transparent 100%
+  );
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 0 20px;
+  }
+  section {
+    padding: 64px 0;
+  }
+  .pageLoadingBody {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 44px 0;
+  }
+  .pageLoadingCopy {
+    height: 170px;
+  }
+  .pageLoadingVisual {
+    width: min(72vw, 280px);
+    height: 300px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.7s var(--ease-premium), transform 0.7s var(--ease-premium);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ===== Loading screen ===== */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  background: var(--bg);
+  transition: background 0.4s ease;
+  padding: 24px;
+}
+
+.loaderMark {
+  width: 68px;
+  height: 68px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border-strong);
+  border-radius: 18px;
+  background: var(--bg-panel);
+  box-shadow: 0 18px 40px -24px var(--accent-soft);
+  animation: loaderMarkPulse 1.8s ease-in-out infinite;
+}
+
+.loaderMark img {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  filter: invert(1) brightness(1.2);
+}
+
+.loaderTrack {
+  width: min(180px, 55vw);
+  height: 2px;
+  overflow: hidden;
+  background: var(--border-strong);
+}
+
+.loaderProgress {
+  display: block;
+  width: 42%;
+  height: 100%;
+  background: var(--accent);
+  animation: loaderProgress 1.15s var(--ease-premium) infinite;
+}
+
+@keyframes loaderMarkPulse {
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes loaderProgress {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(340%); }
+}
+
+.loaderIcons {
+  display: flex;
+  gap: 14px;
+}
+
+.loaderIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-panel);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loaderText {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(28px, 5.6vw, 48px);
+  line-height: 1.28;
+  color: var(--text);
+  margin: 0;
+}
+
+.loaderLine {
+  display: inline-block;
+  min-height: 1em;
+}
+
+.loaderLineMuted {
+  color: var(--text-muted);
+}
+
+.loaderCursor {
+  display: inline-block;
+  width: 3px;
+  height: 0.85em;
+  margin-left: 3px;
+  background: var(--accent);
+  vertical-align: -0.08em;
+  animation: cursorBlink 0.9s steps(1) infinite;
+}
+
+@keyframes cursorBlink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.loaderPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--text-faint);
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--bg-panel);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===== Theme toggle ===== */
+.themeToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-panel);
+  color: var(--text);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.themeToggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}

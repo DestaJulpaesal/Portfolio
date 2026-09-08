@@ -1,0 +1,68 @@
+.infoBox {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: var(--accent-2-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 13px 14px;
+  margin-bottom: 20px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.infoBox svg {
+  flex-shrink: 0;
+  color: var(--accent-2-color);
+  margin-top: 2px;
+}
+
+.infoBox p {
+  margin: 0;
+}
+
+.addForm {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.addForm select {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-panel-alt);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-family: inherit;
+  width: 100%;
+}
+
+.roleSelect {
+  padding: 6px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-panel-alt);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-family: inherit;
+}
+
+.youTag {
+  color: var(--accent-2-color);
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+
+@media (max-width: 780px) {
+  .addForm {
+    grid-template-columns: 1fr;
+  }
+}

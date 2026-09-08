@@ -1,0 +1,125 @@
+.section {
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sectionTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+
+.sectionHint {
+  font-size: 0.76rem;
+  color: var(--text-faint);
+  margin: 0;
+}
+
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border-strong);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.addBtn:hover {
+  color: var(--text);
+  border-color: var(--accent-2-color);
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+}
+
+.rowInputs {
+  flex: 1;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr 1fr;
+  min-width: 0;
+}
+
+.rowInputs.threeCol {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.rowInputs input,
+.rowInputs select {
+  padding: 8px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-panel-alt);
+  color: var(--text);
+  font-size: 0.84rem;
+  font-family: inherit;
+  width: 100%;
+  min-width: 0;
+}
+
+.rowInputs input:focus,
+.rowInputs select:focus {
+  outline: none;
+  border-color: var(--accent-2-color);
+}
+
+.removeBtn {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-panel-alt);
+  color: var(--text-faint);
+  cursor: pointer;
+  margin-top: 1px;
+}
+
+.removeBtn:hover {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.4);
+}
+
+.emptyHint {
+  font-size: 0.8rem;
+  color: var(--text-faint);
+  text-align: center;
+  padding: 10px 0;
+}
+
+@media (max-width: 560px) {
+  .rowInputs,
+  .rowInputs.threeCol {
+    grid-template-columns: 1fr;
+  }
+}
