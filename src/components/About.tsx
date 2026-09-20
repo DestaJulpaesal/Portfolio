@@ -25,7 +25,11 @@ export function About() {
           >
             <div className={styles.photoFrame}>
               {about.photo ? (
-                <img src={about.photo} alt={profile.name} className={styles.photo} />
+                <img
+                  src={about.photo}
+                  alt={profile.name}
+                  className={`${styles.photo} ${styles[`photo-${about.photoFilter ?? "natural"}`]}`}
+                />
               ) : (
                 <div className={`mono ${styles.photoPlaceholder}`}>Foto tentang kamu</div>
               )}

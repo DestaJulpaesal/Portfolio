@@ -10,6 +10,18 @@ export interface SocialLink {
   icon: "github" | "linkedin" | "tiktok" | "instagram" | "whatsapp";
 }
 
+export type PhotoTreatment = "natural" | "warm" | "cool" | "mono" | "cinema" | "vivid" | "soft";
+
+export const PHOTO_TREATMENT_OPTIONS: { value: PhotoTreatment; label: string }[] = [
+  { value: "natural", label: "Natural" },
+  { value: "warm", label: "Warm editorial" },
+  { value: "cool", label: "Cool clean" },
+  { value: "mono", label: "Black & white" },
+  { value: "cinema", label: "Cinema contrast" },
+  { value: "vivid", label: "Vivid pop" },
+  { value: "soft", label: "Soft portrait" },
+];
+
 export const profile = {
   name: "Desta Julpaesal",
   role: "Informatics Student & Web Developer",
@@ -366,6 +378,7 @@ export interface ProfileData {
   headlineAccent: string;
   tagline: string;
   photo: string;
+  photoFilter?: PhotoTreatment;
   logoImage: string;
   location: string;
   email: string;
@@ -377,6 +390,7 @@ export interface ProfileData {
 
 export interface AboutData {
   photo: string;
+  photoFilter?: PhotoTreatment;
   paragraph: string;
   bullets: string[];
 }
@@ -396,6 +410,7 @@ export function defaultProfileData(): ProfileData {
     headlineAccent: profile.headlineAccent,
     tagline: profile.tagline,
     photo: profile.photo,
+    photoFilter: "natural",
     logoImage: profile.logoImage,
     location: profile.location,
     email: profile.email,
@@ -409,6 +424,7 @@ export function defaultProfileData(): ProfileData {
 export function defaultAboutData(): AboutData {
   return {
     photo: aboutText.photo,
+    photoFilter: "natural",
     paragraph: aboutText.paragraph,
     bullets: [...aboutBullets],
   };

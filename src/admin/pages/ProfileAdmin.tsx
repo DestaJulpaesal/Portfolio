@@ -1,7 +1,12 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Loader2, Plus, Trash2, Save, RotateCcw } from "lucide-react";
 import { fetchSiteContent, saveSiteContent } from "../../lib/adminData";
-import { defaultProfileData, type ProfileData, type SocialLink } from "../../data/content";
+import {
+  defaultProfileData,
+  PHOTO_TREATMENT_OPTIONS,
+  type ProfileData,
+  type SocialLink,
+} from "../../data/content";
 import { ImageUploadField } from "../components/ImageUploadField";
 import { useToast } from "../ToastContext";
 import shared from "./AdminPage.module.css";
@@ -214,6 +219,21 @@ export function ProfileAdmin() {
                 onChange={(v) => update("photo", v)}
                 folder="profile"
               />
+            </div>
+
+            <div className={shared.field}>
+              <label htmlFor="pr-photo-filter">Treatment foto profil</label>
+              <select
+                id="pr-photo-filter"
+                value={form.photoFilter ?? "natural"}
+                onChange={(e) => setForm({ ...form, photoFilter: e.target.value as ProfileData["photoFilter"] })}
+              >
+                {PHOTO_TREATMENT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className={`${shared.field} ${shared.fullWidth}`}>

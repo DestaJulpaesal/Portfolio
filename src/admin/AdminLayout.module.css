@@ -32,8 +32,12 @@
 .brandLogo {
   width: 36px;
   height: 36px;
+  padding: 4px;
+  border-radius: 10px;
   object-fit: contain;
   display: block;
+  background: var(--bg-panel-alt);
+  filter: none;
   flex-shrink: 0;
 }
 

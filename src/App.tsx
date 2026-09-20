@@ -27,7 +27,7 @@ function App() {
             transition={{ duration: 0.55, ease: "easeOut" }}
           >
           <Nav />
-          <main className="publicMain">
+          <main>
             <Hero />
             <About />
             <Skills />

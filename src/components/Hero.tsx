@@ -239,7 +239,11 @@ export function Hero() {
                   {/* Sisi depan: foto */}
                   <div className={`${styles.cardFace} ${styles.cardInner}`}>
                     {profile.photo ? (
-                      <img src={profile.photo} alt={profile.name} className={styles.photo} />
+                      <img
+                        src={profile.photo}
+                        alt={profile.name}
+                        className={`${styles.photo} ${styles[`photo-${profile.photoFilter ?? "natural"}`]}`}
+                      />
                     ) : (
                       <div className={`mono ${styles.photoPlaceholder}`}>
                         Taruh foto kamu di

@@ -32,11 +32,15 @@
 .logo {
   width: 40px;
   height: 40px;
+  padding: 4px;
+  border-radius: 11px;
   object-fit: contain;
+  background: var(--bg-panel-alt);
+  filter: none;
 }
 
 [data-theme="dark"] .logo {
-  filter: invert(1) brightness(1.15) drop-shadow(0 2px 6px rgba(255, 255, 255, 0.12));
+  filter: invert(1) brightness(1.15);
 }
 
 .brand {

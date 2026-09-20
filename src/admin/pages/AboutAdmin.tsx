@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Loader2, Save, RotateCcw } from "lucide-react";
 import { fetchSiteContent, saveSiteContent } from "../../lib/adminData";
-import { defaultAboutData, type AboutData } from "../../data/content";
+import { defaultAboutData, PHOTO_TREATMENT_OPTIONS, type AboutData } from "../../data/content";
 import { ImageUploadField } from "../components/ImageUploadField";
 import { TagInput } from "../components/TagInput";
 import { useToast } from "../ToastContext";
@@ -72,6 +72,21 @@ export function AboutAdmin() {
                 onChange={(v) => setForm({ ...form, photo: v })}
                 folder="profile"
               />
+            </div>
+
+            <div className={shared.field}>
+              <label htmlFor="ab-photo-filter">Treatment foto About</label>
+              <select
+                id="ab-photo-filter"
+                value={form.photoFilter ?? "natural"}
+                onChange={(e) => setForm({ ...form, photoFilter: e.target.value as AboutData["photoFilter"] })}
+              >
+                {PHOTO_TREATMENT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className={`${shared.field} ${shared.fullWidth}`}>

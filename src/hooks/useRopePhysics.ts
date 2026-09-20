@@ -50,7 +50,6 @@ export function useRopePhysics(opts: RopePhysicsOptions, callbacks: RopePhysicsC
   const rafRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number | null>(null);
   const timeRef = useRef(0);
-  const dropStartedAtRef = useRef(0);
   const cardHalfWidthRef = useRef(95);
   const svgCenterXRef = useRef(260);
   const svgPadTopRef = useRef(420);
@@ -62,19 +61,18 @@ export function useRopePhysics(opts: RopePhysicsOptions, callbacks: RopePhysicsC
   const optsRef = useRef(opts);
   optsRef.current = opts;
 
-  // Reset titik-titik tali dalam keadaan rapat di dekat anchor. Setiap titik
-  // dilepas sedikit setelah titik sebelumnya supaya tali dan kartu jatuh
-  // bertahap, mengikuti ritme reveal headline di sisi kiri.
+  // Reset & susun ulang titik-titik tali dalam keadaan "tergulung" dekat
+  // anchor, lalu lepas -- gravitasi + constraint solver bikin dia jatuh
+  // sambil meliuk turun sendiri, bukan cuma scaleY lurus dari 0 ke 1.
   const dropIn = useCallback(() => {
     const length = optsRef.current.getLength();
     const segLen = length / N;
-    dropStartedAtRef.current = performance.now();
     for (let i = 0; i <= N; i++) {
-      const wobble = Math.sin(i * 1.7) * segLen * 0.42;
+      const wobble = Math.sin(i * 1.7) * segLen * 0.55;
       xs.current[i] = i === 0 ? 0 : wobble;
-      ys.current[i] = i * segLen * 0.08;
+      ys.current[i] = i * segLen * 0.12;
       pxs.current[i] = xs.current[i];
-      pys.current[i] = ys.current[i];
+      pys.current[i] = ys.current[i] - segLen * 0.02;
     }
     settledRef.current = false;
   }, [N]);
@@ -106,33 +104,21 @@ export function useRopePhysics(opts: RopePhysicsOptions, callbacks: RopePhysicsC
       const segLen = length / N;
       const g = gravity;
       const dragging = draggingRef.current;
-      const dropElapsed = Math.max(0, t - dropStartedAtRef.current);
-      const dropStagger = 135;
 
       // Integrasi Verlet untuk semua titik selain anchor (index 0, selalu
       // dijepit di 0,0) dan -- kalau lagi ditarik -- selain titik terakhir
       // (yang dipaksa mengikuti posisi pointer).
       for (let i = 1; i <= N; i++) {
         if (dragging && i === N) continue;
-        const release = Math.max(0, Math.min(1, (dropElapsed - i * dropStagger) / 720));
-        const releaseEase = release * release * (3 - 2 * release);
         const vx = (xs.current[i] - pxs.current[i]) * damping;
         const vy = (ys.current[i] - pys.current[i]) * damping;
         const wind = Math.sin(timeRef.current * 0.85 + i * 0.8) * (i / N) * windAmplitude;
-        const nx = xs.current[i] + vx + wind * releaseEase * dt * dt;
-        const ny = ys.current[i] + vy + g * releaseEase * dt * dt;
+        const nx = xs.current[i] + vx + wind * dt * dt;
+        const ny = ys.current[i] + vy + g * dt * dt;
         pxs.current[i] = xs.current[i];
         pys.current[i] = ys.current[i];
         xs.current[i] = nx;
         ys.current[i] = ny;
-
-        // Keep unreleased links gathered near the anchor. Once released,
-        // Verlet integration takes over and the link falls naturally.
-        if (!dragging && release < 1) {
-          const gatheredY = i * segLen * 0.08;
-          ys.current[i] += (gatheredY - ys.current[i]) * (1 - releaseEase) * 0.38;
-          xs.current[i] *= 0.82 + releaseEase * 0.18;
-        }
       }
 
       if (dragging) {

@@ -1,17 +1,9 @@
 .nav {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  width: 100%;
   z-index: 50;
   transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   border-bottom: 1px solid transparent;
-  background: rgba(var(--bg-rgb), 0.48);
-  backdrop-filter: blur(10px);
-}
-
-:global(.publicMain) {
-  padding-top: clamp(64px, 7vw, 76px);
 }
 
 .progressBar {
@@ -37,8 +29,6 @@
   justify-content: space-between;
   height: clamp(64px, 7vw, 76px);
   gap: 24px;
-  position: relative;
-  z-index: 1;
 }
 
 .mark {
@@ -47,7 +37,7 @@
   gap: 10px;
   text-decoration: none;
   color: var(--text);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   flex-shrink: 0;
 }
@@ -85,10 +75,6 @@
   display: flex;
   gap: clamp(16px, 2.2vw, 26px);
   flex-wrap: nowrap;
-  padding: 8px 14px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: rgba(var(--bg-rgb), 0.36);
 }
 
 .link {
@@ -122,7 +108,7 @@
 /* Section aktif (hasil scroll-spy) — tetap menyala tanpa perlu hover,
    supaya user selalu tahu sedang di bagian mana halaman. */
 .linkActive {
-  color: var(--accent-2);
+  color: var(--text);
 }
 
 .linkActive::after {
