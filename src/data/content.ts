@@ -28,11 +28,10 @@ export const profile = {
   logoMark: "",
   logoImage: "/logo.png",
   availability: "Terbuka untuk kolaborasi & proyek",
-  headlineTop: "Saya Membangun",
-  headlineAccent: "Sistem & Solusi Web Modern",
+  headlineAccent: "Web Developer",
   tagline:
     "Mahasiswa Teknik Informatika UNIKOM berlatar belakang SMK RPL. Berfokus pada pengembangan sistem web yang terstruktur, fungsional, dan mudah digunakan.",
-  photo: "/projects/hero-cutout.png",
+  photo: "/projects/hero-reference.webp",
   location: "Citatah Nyalindung, Cirawamekar, Bandung Barat",
   email: "destajulpaesal@gmail.com", 
   phone: "+62 821-1899-6827",
@@ -374,7 +373,6 @@ export interface ProfileData {
   role: string;
   logoMark: string;
   availability: string;
-  headlineTop: string;
   headlineAccent: string;
   tagline: string;
   photo: string;
@@ -406,7 +404,6 @@ export function defaultProfileData(): ProfileData {
     role: profile.role,
     logoMark: profile.logoMark,
     availability: profile.availability,
-    headlineTop: profile.headlineTop,
     headlineAccent: profile.headlineAccent,
     tagline: profile.tagline,
     photo: profile.photo,

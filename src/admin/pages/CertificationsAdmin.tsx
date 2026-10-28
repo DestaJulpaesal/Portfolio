@@ -53,7 +53,7 @@ export function CertificationsAdmin() {
       setError(
         err instanceof Error
           ? err.message
-          : "Gagal memuat sertifikasi. Pastikan tabel 'certifications' sudah dibuat lewat supabase-setup.sql."
+          : "Gagal memuat sertifikasi. Periksa koneksi API dan PostgreSQL."
       );
     }
   }

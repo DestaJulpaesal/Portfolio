@@ -6,124 +6,81 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Session } from "@supabase/supabase-js";
-import { supabase, isSupabaseConfigured } from "../lib/supabase";
-import { fetchAdminRole, type AdminRole } from "../lib/adminData";
+import { apiRequest } from "../lib/api";
+import type { AdminRole } from "../lib/adminData";
+
+interface AdminSession {
+  user: { id: string; email: string };
+}
 
 interface AdminAuthValue {
-  session: Session | null;
+  session: AdminSession | null;
   loading: boolean;
   configured: boolean;
-  /** null = sudah dicek tapi akun ini TIDAK terdaftar di tabel admin_users. */
   role: AdminRole | null;
-  /** true selagi masih mengecek tabel admin_users setelah session didapat. */
   checkingRole: boolean;
   isOwner: boolean;
-  /** Diisi kalau login Supabase Auth berhasil tapi akun belum terdaftar sebagai admin. */
   unauthorizedMessage: string | null;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string, website?: string) => Promise<void>;
   signOut: () => Promise<void>;
+}
+
+interface AuthResponse {
+  session: (AdminSession & { role: AdminRole }) | null;
 }
 
 const AdminAuthContext = createContext<AdminAuthValue | undefined>(undefined);
 
-const UNAUTHORIZED_MSG =
-  "Akun ini berhasil login tapi belum terdaftar sebagai admin. Minta admin lain (role owner) mendaftarkan akunmu lewat halaman Manage Admins, atau tambahkan manual lewat SQL Editor Supabase (lihat supabase-setup.sql).";
-
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState<AdminSession | null>(null);
   const [role, setRole] = useState<AdminRole | null>(null);
-  const [checkingRole, setCheckingRole] = useState(false);
-  const [unauthorizedMessage, setUnauthorizedMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [configured, setConfigured] = useState(true);
 
   useEffect(() => {
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
-
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setLoading(false);
-    });
-
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-    });
-
-    return () => listener.subscription.unsubscribe();
-  }, []);
-
-  // Setiap kali ada session (baru login / restore session), cek apakah akun
-  // ini terdaftar di tabel admin_users. Kalau tidak — sekadar berhasil login
-  // ke Supabase Auth TIDAK cukup untuk dianggap admin — otomatis sign out
-  // dan tampilkan pesan yang jelas ke pengguna.
-  useEffect(() => {
-    if (!session || !supabase) {
-      setRole(null);
-      setUnauthorizedMessage(null);
-      return;
-    }
-
     let cancelled = false;
-    setCheckingRole(true);
-    setUnauthorizedMessage(null);
-    const client = supabase;
-
-    fetchAdminRole(session.user.id)
-      .then(async (row) => {
+    apiRequest<AuthResponse>("/api/auth/session")
+      .then(({ session: current }) => {
         if (cancelled) return;
-        if (!row) {
-          setRole(null);
-          setUnauthorizedMessage(UNAUTHORIZED_MSG);
-          await client.auth.signOut();
-        } else {
-          setRole(row.role);
-        }
+        setSession(current);
+        setRole(current?.role ?? null);
       })
       .catch(() => {
-        if (cancelled) return;
-        // Tabel admin_users belum dibuat (belum jalankan supabase-setup.sql
-        // versi terbaru) — daripada mengunci semua orang, izinkan masuk
-        // sebagai 'owner' sementara supaya tidak jadi lockout total, tapi
-        // beri tahu lewat console untuk developer.
-        console.warn(
-          "Tabel 'admin_users' belum ditemukan — jalankan blok terbaru di supabase-setup.sql. Sementara semua akun login dianggap owner."
-        );
-        setRole("owner");
+        if (!cancelled) setConfigured(false);
       })
       .finally(() => {
-        if (!cancelled) setCheckingRole(false);
+        if (!cancelled) setLoading(false);
       });
-
     return () => {
       cancelled = true;
     };
-  }, [session]);
+  }, []);
 
   const value = useMemo<AdminAuthValue>(
     () => ({
       session,
       loading,
-      configured: isSupabaseConfigured,
+      configured,
       role,
-      checkingRole,
+      checkingRole: false,
       isOwner: role === "owner",
-      unauthorizedMessage,
-      async signIn(email: string, password: string) {
-        if (!supabase) {
-          throw new Error("Supabase belum dikonfigurasi. Isi VITE_SUPABASE_URL & VITE_SUPABASE_ANON_KEY di .env");
-        }
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+      unauthorizedMessage: null,
+      async signIn(email, password, website = "") {
+        const result = await apiRequest<AuthResponse>("/api/auth/login", {
+          method: "POST",
+          body: JSON.stringify({ email, password, website }),
+        });
+        setConfigured(true);
+        setSession(result.session);
+        setRole(result.session?.role ?? null);
       },
       async signOut() {
-        if (!supabase) return;
-        await supabase.auth.signOut();
+        await apiRequest<void>("/api/auth/logout", { method: "POST" });
+        setSession(null);
+        setRole(null);
       },
     }),
-    [session, loading, role, checkingRole, unauthorizedMessage]
+    [session, loading, configured, role]
   );
 
   return <AdminAuthContext.Provider value={value}>{children}</AdminAuthContext.Provider>;

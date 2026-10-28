@@ -48,7 +48,7 @@ export function MessagesAdmin() {
       setError(
         err instanceof Error
           ? err.message
-          : "Gagal memuat pesan. Pastikan tabel 'messages' & kolom is_read sudah dibuat lewat supabase-setup.sql."
+          : "Gagal memuat pesan. Periksa koneksi API dan PostgreSQL."
       );
     }
   }

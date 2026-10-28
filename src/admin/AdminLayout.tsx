@@ -35,7 +35,7 @@ const contentNavItems = [
 ];
 
 export function AdminLayout({ children }: PropsWithChildren) {
-  const { signOut, isOwner } = useAdminAuth();
+  const { signOut, isOwner, session } = useAdminAuth();
   const { notify } = useToast();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -81,43 +81,50 @@ export function AdminLayout({ children }: PropsWithChildren) {
 
       <aside className={`${styles.sidebar} ${mobileOpen ? styles.sidebarOpen : ""}`}>
         <div className={styles.brand}>
-          <img src={profile.logoImage} alt="" className={styles.brandLogo} />
-          <div>
+          <span className={styles.brandLogoWrap}>
+            <img src={profile.logoImage} alt="" className={styles.brandLogo} />
+          </span>
+          <div className={styles.brandCopy}>
             <p className={styles.brandName}>{profile.name}</p>
-            <p className={`mono ${styles.brandTag}`}>Admin Panel</p>
+            <p className={styles.brandTag}><span />PORTFOLIO STUDIO</p>
           </div>
         </div>
 
         <nav className={styles.nav}>
-          {mainNavItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
-              onClick={() => setMobileOpen(false)}
-            >
-              <item.icon size={17} />
-              {item.label}
-              {item.badge && unread > 0 && <span className={styles.navBadge}>{unread}</span>}
-            </NavLink>
-          ))}
+          <div className={styles.navGroup}>
+            <p className={styles.navGroupLabel}>Workspace</p>
+            {mainNavItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
+                onClick={() => setMobileOpen(false)}
+              >
+                <item.icon size={17} />
+                <span className={styles.navLabel}>{item.label}</span>
+                {item.badge && unread > 0 && <span className={styles.navBadge}>{unread}</span>}
+              </NavLink>
+            ))}
+          </div>
 
-          <p className={styles.navGroupLabel}>Konten</p>
-          {contentNavItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
-              onClick={() => setMobileOpen(false)}
-            >
-              <item.icon size={17} />
-              {item.label}
-            </NavLink>
-          ))}
+          <div className={styles.navGroup}>
+            <p className={styles.navGroupLabel}>Konten</p>
+            {contentNavItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
+                onClick={() => setMobileOpen(false)}
+              >
+                <item.icon size={17} />
+                <span className={styles.navLabel}>{item.label}</span>
+              </NavLink>
+            ))}
+          </div>
 
           {isOwner && (
-            <>
+            <div className={styles.navGroup}>
               <p className={styles.navGroupLabel}>Pengaturan</p>
               <NavLink
                 to="/admin/admins"
@@ -125,15 +132,27 @@ export function AdminLayout({ children }: PropsWithChildren) {
                 onClick={() => setMobileOpen(false)}
               >
                 <ShieldCheck size={17} />
-                Manage Admins
+                <span className={styles.navLabel}>Manage Admins</span>
               </NavLink>
-            </>
+            </div>
           )}
         </nav>
 
         <div className={styles.sidebarFooter}>
+          <div className={styles.accountCard}>
+            <span className={styles.accountAvatar}>
+              {session?.user.email?.charAt(0).toUpperCase() ?? "A"}
+              <i />
+            </span>
+            <span className={styles.accountDetails}>
+              <strong>{session?.user.email ?? "Admin"}</strong>
+              <span>{isOwner ? "Owner" : "Editor"}</span>
+            </span>
+          </div>
           <a href="/" className={styles.viewSite}>
-            <ExternalLink size={15} /> Lihat situs publik
+            <ExternalLink size={15} />
+            <span>Lihat situs publik</span>
+            <span className={styles.viewArrow}>↗</span>
           </a>
           <div className={styles.footerRow}>
             <ThemeToggle />

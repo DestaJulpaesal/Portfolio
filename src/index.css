@@ -1,21 +1,21 @@
 :root,
 [data-theme="dark"] {
-  --bg: #0c0a0d;
-  --bg-rgb: 12, 10, 13;
-  --bg-panel: #16131a;
-  --bg-panel-alt: #1c1922;
+  --bg: #080d0b;
+  --bg-rgb: 8, 13, 11;
+  --bg-panel: #101813;
+  --bg-panel-alt: #151e19;
   --text: #f3f0ee;
-  --text-muted: #a19cad;
-  --text-faint: #625d6d;
-  --border: rgba(243, 240, 238, 0.08);
-  --border-strong: rgba(243, 240, 238, 0.16);
-  --accent: #e2703f;
-  --accent-2: #eb9463;
-  --accent-soft: rgba(226, 112, 63, 0.15);
-  --accent-2-soft: rgba(124, 128, 240, 0.14);
-  --accent-2-color: #7c80f0;
-  --grid-line: rgba(243, 240, 238, 0.06);
-  --grid-fade: #0c0a0d;
+  --text-muted: #a1aea7;
+  --text-faint: #68766e;
+  --border: rgba(226, 244, 234, 0.08);
+  --border-strong: rgba(226, 244, 234, 0.16);
+  --accent: #32d997;
+  --accent-2: #67efb5;
+  --accent-soft: rgba(50, 217, 151, 0.14);
+  --accent-2-soft: rgba(58, 181, 127, 0.13);
+  --accent-2-color: #1ea873;
+  --grid-line: rgba(226, 244, 234, 0.06);
+  --grid-fade: #080d0b;
 
   --font-display: "Newsreader", "Iowan Old Style", serif;
   --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
@@ -50,11 +50,11 @@
   --text-faint: #8d8792;
   --border: rgba(29, 26, 31, 0.09);
   --border-strong: rgba(29, 26, 31, 0.16);
-  --accent: #b8501f;
-  --accent-2: #d97a3f;
-  --accent-soft: rgba(184, 80, 31, 0.12);
-  --accent-2-soft: rgba(78, 82, 199, 0.1);
-  --accent-2-color: #4e52c7;
+  --accent: #087f5b;
+  --accent-2: #10a872;
+  --accent-soft: rgba(8, 127, 91, 0.12);
+  --accent-2-soft: rgba(16, 168, 114, 0.1);
+  --accent-2-color: #0d9967;
   --grid-line: rgba(29, 26, 31, 0.06);
   --grid-fade: #f8f5f1;
 

@@ -77,7 +77,7 @@ export function ProjectsAdmin() {
       setRows(data);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal memuat proyek. Pastikan tabel 'projects' sudah dibuat lewat supabase-setup.sql.");
+      setError(err instanceof Error ? err.message : "Gagal memuat proyek. Periksa koneksi API dan PostgreSQL.");
     }
   }
 

@@ -22,7 +22,7 @@ export function AboutAdmin() {
       setError(
         err instanceof Error
           ? err.message
-          : "Gagal memuat data About. Pastikan tabel 'site_content' sudah dibuat lewat supabase-setup.sql."
+          : "Gagal memuat data About. Periksa koneksi API dan PostgreSQL."
       );
       setForm(defaultAboutData());
     }

@@ -7,19 +7,13 @@ import { getLoginLockout, registerFailedAttempt, resetLoginAttempts } from "../l
 import styles from "./Login.module.css";
 
 export function Login() {
-  const { session, configured, signIn, loading, unauthorizedMessage } = useAdminAuth();
+  const { session, configured, signIn, loading } = useAdminAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [honeypot, setHoneypot] = useState(""); // field jebakan bot — manusia tidak akan mengisi ini
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [lockout, setLockout] = useState(() => getLoginLockout());
-
-  // Tampilkan pesan dari AdminAuthContext kalau akun berhasil login ke
-  // Supabase Auth tapi belum terdaftar sebagai admin (lihat AdminAuthContext).
-  useEffect(() => {
-    if (unauthorizedMessage) setError(unauthorizedMessage);
-  }, [unauthorizedMessage]);
 
   // Update hitungan mundur lockout tiap detik selagi terkunci.
   useEffect(() => {
@@ -54,7 +48,7 @@ export function Login() {
 
     setSubmitting(true);
     try {
-      await signIn(email, password);
+      await signIn(email, password, honeypot);
       resetLoginAttempts();
     } catch (err) {
       const next = registerFailedAttempt();
@@ -91,9 +85,8 @@ export function Login() {
           <div className={styles.warning}>
             <ShieldAlert size={16} />
             <span>
-              Supabase belum dikonfigurasi. Isi <code>VITE_SUPABASE_URL</code> dan{" "}
-              <code>VITE_SUPABASE_ANON_KEY</code> di file <code>.env</code>, lalu jalankan{" "}
-              <code>supabase-setup.sql</code> dan buat user admin di Supabase Dashboard.
+              API tidak terhubung. Jalankan layanan PostgreSQL dan API dengan{" "}
+              <code>docker compose up -d</code>, lalu periksa konfigurasi di <code>.env</code>.
             </span>
           </div>
         )}

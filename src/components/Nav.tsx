@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { ArrowRight, Download, Menu, X } from "lucide-react";
+import { hasRealUrl } from "../data/content";
 import { useProfileContent } from "../hooks/useSiteContent";
 import { MagneticButton } from "./ui/MagneticButton";
 import { ThemeToggle } from "./ui/ThemeToggle";
@@ -59,15 +60,15 @@ export function Nav() {
   return (
     <header className={`${styles.nav} ${scrolled ? styles.scrolled : ""}`}>
       <span className={styles.progressBar} style={{ width: `${progress}%` }} aria-hidden="true" />
-      <div className={`container ${styles.inner}`}>
+      <div className={styles.inner}>
         <a href="#top" className={styles.mark} aria-label="Kembali ke atas">
-          <span className={styles.markIcon}>
-            <img src={profile.logoImage} alt="" className={styles.markImg} />
-          </span>
-          <span className="mono">
-            {profile.logoMark && `${profile.logoMark}.`}
-            {profile.name.split(" ")[0].toUpperCase()}
-          </span>
+          <img
+            src={profile.logoImage || "/logo.png"}
+            alt=""
+            className={styles.markLogo}
+            aria-hidden="true"
+          />
+          <span className={styles.markName}>{profile.name.split(" ")[0].toUpperCase()}</span>
         </a>
 
         <nav className={styles.links} aria-label="Navigasi utama">
@@ -86,9 +87,15 @@ export function Nav() {
         <div className={styles.actions}>
           <ThemeToggle className={styles.themeToggleGap} />
 
-          <MagneticButton href="#contact" variant="primary" className={styles.cta}>
-            Let's Talk →
-          </MagneticButton>
+          {hasRealUrl(profile.cvUrl) ? (
+            <MagneticButton href={profile.cvUrl} variant="ghost" className={styles.cta} download>
+              <Download size={14} /> Download CV
+            </MagneticButton>
+          ) : (
+            <MagneticButton href="#contact" variant="ghost" className={styles.cta}>
+              Hubungi Saya <ArrowRight size={14} />
+            </MagneticButton>
+          )}
 
           <button
             className={styles.burger}

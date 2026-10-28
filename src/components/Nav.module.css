@@ -1,9 +1,19 @@
 .nav {
-  position: sticky;
+  position: absolute;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 50;
+  background: transparent;
   transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   border-bottom: 1px solid transparent;
+}
+
+.nav:not(.scrolled) .mark,
+.nav:not(.scrolled) .link,
+.nav:not(.scrolled) .burger,
+.nav:not(.scrolled) button {
+  color: #effaf4;
 }
 
 .progressBar {
@@ -17,9 +27,10 @@
 }
 
 .scrolled {
+  position: fixed;
   backdrop-filter: blur(14px);
-  background: rgba(var(--bg-rgb), 0.78);
-  border-bottom: 1px solid var(--border-strong);
+  background: rgba(1, 13, 9, 0.86);
+  border-bottom: 1px solid rgba(93, 255, 195, 0.14);
   box-shadow: 0 14px 30px -24px rgba(0, 0, 0, 0.8);
 }
 
@@ -28,47 +39,42 @@
   align-items: center;
   justify-content: space-between;
   height: clamp(64px, 7vw, 76px);
+  width: 100%;
+  max-width: 1800px;
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding-right: clamp(28px, 5.2vw, 92px);
+  padding-left: clamp(28px, 5.2vw, 92px);
   gap: 24px;
 }
 
 .mark {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   text-decoration: none;
-  color: var(--text);
-  font-size: 14px;
-  font-weight: 600;
+  color: #effaf4;
+  font-size: 11px;
+  font-weight: 700;
   flex-shrink: 0;
 }
 
-.markIcon {
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+.markLogo {
+  display: block;
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  filter: invert(1) brightness(1.15);
   transition: transform 0.2s ease;
 }
 
-.mark:hover .markIcon {
-  transform: scale(1.06);
+.mark:hover .markLogo {
+  transform: scale(1.08);
 }
 
-.markImg {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-  filter: none;
-  transition: filter 0.3s ease;
-}
-
-/* Logo aslinya monokrom hitam — di dark mode di-invert jadi putih
-   supaya tetap kelihatan tanpa perlu kotak background warna. */
-[data-theme="dark"] .markImg {
-  filter: invert(1) brightness(1.2) drop-shadow(0 2px 6px rgba(255, 255, 255, 0.12));
+.markName {
+  color: #eef9f3;
+  letter-spacing: 0.14em;
 }
 
 .links {
@@ -79,8 +85,8 @@
 
 .link {
   text-decoration: none;
-  color: var(--text-muted);
-  font-size: 13px;
+  color: rgba(230, 243, 235, 0.78);
+  font-size: 11px;
   white-space: nowrap;
   transition: color 0.2s ease;
   position: relative;
@@ -92,13 +98,14 @@
   left: 0;
   bottom: -6px;
   width: 0%;
-  height: 1.5px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-2-color));
+  height: 2px;
+  background: linear-gradient(90deg, #24e9a6, #00c98b);
+  box-shadow: 0 0 10px rgba(36, 233, 166, 0.65);
   transition: width 0.3s var(--ease-premium);
 }
 
 .link:hover {
-  color: var(--text);
+  color: #24e9a6;
 }
 
 .link:hover::after {
@@ -108,7 +115,7 @@
 /* Section aktif (hasil scroll-spy) — tetap menyala tanpa perlu hover,
    supaya user selalu tahu sedang di bagian mana halaman. */
 .linkActive {
-  color: var(--text);
+  color: #24e9a6;
 }
 
 .linkActive::after {
@@ -123,11 +130,25 @@
 }
 
 .themeToggleGap {
-  margin-right: 2px;
+  margin-right: 3px;
+  width: 34px;
+  height: 34px;
+  border-color: rgba(93, 255, 195, 0.18);
+  background: rgba(3, 25, 18, 0.56);
+  color: #e8f7ef;
 }
 
 .cta {
   flex-shrink: 0;
+  min-height: 38px;
+  padding: 9px 17px;
+  border: 1px solid rgba(89, 255, 190, 0.34);
+  border-radius: 999px;
+  color: #effaf4;
+  background: rgba(8, 47, 34, 0.62);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
 }
 
 .burger {
@@ -157,8 +178,8 @@
     display: flex;
     flex-direction: column;
     padding: 8px 20px 20px;
-    background: rgba(var(--bg-rgb), 0.98);
-    border-bottom: 1px solid var(--border);
+    background: rgba(1, 13, 9, 0.98);
+    border-bottom: 1px solid rgba(123, 245, 190, 0.14);
   }
   .mobileLink {
     text-decoration: none;

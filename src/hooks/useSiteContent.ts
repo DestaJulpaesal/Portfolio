@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { isSupabaseConfigured } from "../lib/supabase";
 import { fetchSiteContent } from "../lib/adminData";
 import {
   defaultProfileData,
@@ -12,16 +11,15 @@ import {
 
 /**
  * Sama seperti useProjects/useCertifications di useContentData.ts: ambil
- * override dari Supabase (tabel "site_content") kalau sudah dikonfigurasi,
+ * override dari API PostgreSQL (tabel "site_content") kalau server tersedia,
  * dan diam-diam fallback ke data statis di content.ts kalau belum di-setup
  * atau baris untuk section itu belum pernah disimpan lewat /admin.
  */
 function useSiteSection<T>(section: "profile" | "about" | "skills", getDefault: () => T) {
   const [data, setData] = useState<T>(getDefault);
-  const [loading, setLoading] = useState(isSupabaseConfigured);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return;
     let cancelled = false;
 
     fetchSiteContent<T>(section)
@@ -29,7 +27,7 @@ function useSiteSection<T>(section: "profile" | "about" | "skills", getDefault: 
         if (!cancelled && row) setData(row);
       })
       .catch(() => {
-        // Tabel belum dibuat / query gagal — diam-diam pakai fallback statis.
+        // Keep the published portfolio available while the API is offline.
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

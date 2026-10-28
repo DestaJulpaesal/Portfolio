@@ -21,7 +21,7 @@ export function SkillsAdmin() {
       setError(
         err instanceof Error
           ? err.message
-          : "Gagal memuat data Skills. Pastikan tabel 'site_content' sudah dibuat lewat supabase-setup.sql."
+          : "Gagal memuat data Skills. Periksa koneksi API dan PostgreSQL."
       );
       setForm(defaultSkillsData());
     }

@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { contactInfo } from "../data/content";
 import { useProfileContent } from "../hooks/useSiteContent";
-import { isSupabaseConfigured, sendContactMessage } from "../lib/supabase";
+import { sendContactMessage } from "../lib/api";
 import { WhatsAppIcon } from "./icons/BrandIcons";
 import styles from "./Contact.module.css";
 
@@ -141,13 +141,6 @@ export function Contact() {
           >
             <p className={styles.formEyebrow}>Kirim Pesan</p>
             <h3 className={styles.formHeading}>Ceritakan proyekmu</h3>
-
-            {!isSupabaseConfigured && (
-              <p className={styles.notice}>
-                Form ini siap dipakai — tinggal hubungkan ke Supabase kamu lewat file{" "}
-                <code>.env</code> (lihat <code>.env.example</code>).
-              </p>
-            )}
 
             <div className={styles.row}>
               <div className={styles.field}>

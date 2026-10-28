@@ -35,7 +35,7 @@ export function ProfileAdmin() {
       setError(
         err instanceof Error
           ? err.message
-          : "Gagal memuat data profil. Pastikan tabel 'site_content' sudah dibuat lewat supabase-setup.sql."
+          : "Gagal memuat data profil. Periksa koneksi API dan PostgreSQL."
       );
       setForm(defaultProfileData());
     }
@@ -125,21 +125,22 @@ export function ProfileAdmin() {
         <form onSubmit={handleSubmit} className={shared.form} noValidate>
           <div className={shared.formGrid}>
             <div className={shared.field}>
-              <label htmlFor="pr-headline-top">Headline baris 1</label>
+              <label htmlFor="pr-name">Nama headline</label>
               <input
-                id="pr-headline-top"
+                id="pr-name"
                 type="text"
-                value={form.headlineTop}
-                onChange={(e) => update("headlineTop", e.target.value)}
+                value={form.name}
+                onChange={(e) => update("name", e.target.value)}
               />
             </div>
             <div className={shared.field}>
-              <label htmlFor="pr-headline-accent">Headline baris 2 (aksen)</label>
+              <label htmlFor="pr-headline-accent">Judul profesi (aksen)</label>
               <input
                 id="pr-headline-accent"
                 type="text"
                 value={form.headlineAccent}
                 onChange={(e) => update("headlineAccent", e.target.value)}
+                placeholder="mis. Web Developer"
               />
             </div>
 
@@ -214,7 +215,7 @@ export function ProfileAdmin() {
             <div className={`${shared.field} ${shared.fullWidth}`}>
               <ImageUploadField
                 id="pr-photo"
-                label="Foto profil (Hero & About)"
+                label="Foto Hero (PNG/WebP tanpa latar direkomendasikan)"
                 value={form.photo}
                 onChange={(v) => update("photo", v)}
                 folder="profile"
@@ -250,7 +251,7 @@ export function ProfileAdmin() {
               <div className={repeater.section}>
                 <div className={repeater.sectionHead}>
                   <div>
-                    <p className={repeater.sectionTitle}>Statistik (di section About)</p>
+                    <p className={repeater.sectionTitle}>Statistik (Hero & About)</p>
                     <p className={repeater.sectionHint}>mis. Semester — 2, Project Selesai — 10</p>
                   </div>
                   <button type="button" className={repeater.addBtn} onClick={addStat}>

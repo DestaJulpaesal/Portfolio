@@ -18,7 +18,6 @@ export interface RopePhysicsOptions {
 }
 
 export interface RopePhysicsCallbacks {
-  onTap?: () => void;
   onGrabChange?: (grabbing: boolean) => void;
 }
 
@@ -41,19 +40,27 @@ export function useRopePhysics(opts: RopePhysicsOptions, callbacks: RopePhysicsC
   const ys = useRef(new Float64Array(N + 1));
   const pxs = useRef(new Float64Array(N + 1));
   const pys = useRef(new Float64Array(N + 1));
+  const settleStartX = useRef(new Float64Array(N + 1));
+  const settleStartY = useRef(new Float64Array(N + 1));
 
   const draggingRef = useRef(false);
   const pointerTarget = useRef({ x: 0, y: 0 });
-  const pointerStartClient = useRef({ x: 0, y: 0 });
-  const movedRef = useRef(false);
+  const pointerGrabOffset = useRef({ x: 0, y: 0 });
+  const pointerVelocity = useRef({ x: 0, y: 0 });
+  const lastPointerMove = useRef({ time: 0 });
   const anchorClient = useRef({ x: 0, y: 0 });
   const rafRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number | null>(null);
   const timeRef = useRef(0);
+  const calmTimeRef = useRef(0);
+  const settleElapsedRef = useRef(0);
+  const settleDurationRef = useRef(0.45);
   const cardHalfWidthRef = useRef(95);
   const svgCenterXRef = useRef(260);
   const svgPadTopRef = useRef(420);
   const settledRef = useRef(false);
+  const settlingRef = useRef(false);
+  const renderedCard = useRef({ x: 0, y: 0, angle: 0, initialized: false });
 
   const callbacksRef = useRef(callbacks);
   callbacksRef.current = callbacks;
@@ -61,20 +68,27 @@ export function useRopePhysics(opts: RopePhysicsOptions, callbacks: RopePhysicsC
   const optsRef = useRef(opts);
   optsRef.current = opts;
 
-  // Reset & susun ulang titik-titik tali dalam keadaan "tergulung" dekat
-  // anchor, lalu lepas -- gravitasi + constraint solver bikin dia jatuh
-  // sambil meliuk turun sendiri, bukan cuma scaleY lurus dari 0 ke 1.
+  // Fold the rope into a compact coil; gravity then pulls the lower links down
+  // first so it gradually unravels instead of extending as a straight line.
   const dropIn = useCallback(() => {
     const length = optsRef.current.getLength();
     const segLen = length / N;
+    const turnAngle = 2.3;
+    const coilRadius = segLen / (2 * Math.sin(turnAngle / 2));
     for (let i = 0; i <= N; i++) {
-      const wobble = Math.sin(i * 1.7) * segLen * 0.55;
-      xs.current[i] = i === 0 ? 0 : wobble;
-      ys.current[i] = i * segLen * 0.12;
+      const angle = i * turnAngle;
+      xs.current[i] = coilRadius * (1 - Math.cos(angle));
+      ys.current[i] = coilRadius * Math.sin(angle);
       pxs.current[i] = xs.current[i];
-      pys.current[i] = ys.current[i] - segLen * 0.02;
+      pys.current[i] = ys.current[i];
     }
+    xs.current[0] = 0;
+    ys.current[0] = 0;
+    calmTimeRef.current = 0;
+    settleElapsedRef.current = 0;
     settledRef.current = false;
+    settlingRef.current = false;
+    renderedCard.current.initialized = false;
   }, [N]);
 
   const updateAnchorClient = useCallback(() => {
@@ -82,6 +96,9 @@ export function useRopePhysics(opts: RopePhysicsOptions, callbacks: RopePhysicsC
     if (!stage) return;
     const rect = stage.getBoundingClientRect();
     anchorClient.current = { x: rect.left + rect.width / 2, y: rect.top };
+    if (cardWrapRef.current) {
+      cardHalfWidthRef.current = cardWrapRef.current.offsetWidth / 2;
+    }
   }, []);
 
   useEffect(() => {
@@ -104,57 +121,116 @@ export function useRopePhysics(opts: RopePhysicsOptions, callbacks: RopePhysicsC
       const segLen = length / N;
       const g = gravity;
       const dragging = draggingRef.current;
-
-      // Integrasi Verlet untuk semua titik selain anchor (index 0, selalu
-      // dijepit di 0,0) dan -- kalau lagi ditarik -- selain titik terakhir
-      // (yang dipaksa mengikuti posisi pointer).
-      for (let i = 1; i <= N; i++) {
-        if (dragging && i === N) continue;
-        const vx = (xs.current[i] - pxs.current[i]) * damping;
-        const vy = (ys.current[i] - pys.current[i]) * damping;
-        const wind = Math.sin(timeRef.current * 0.85 + i * 0.8) * (i / N) * windAmplitude;
-        const nx = xs.current[i] + vx + wind * dt * dt;
-        const ny = ys.current[i] + vy + g * dt * dt;
-        pxs.current[i] = xs.current[i];
-        pys.current[i] = ys.current[i];
-        xs.current[i] = nx;
-        ys.current[i] = ny;
-      }
-
       if (dragging) {
-        pxs.current[N] = xs.current[N];
-        pys.current[N] = ys.current[N];
-        xs.current[N] = pointerTarget.current.x;
-        ys.current[N] = pointerTarget.current.y;
+        calmTimeRef.current = 0;
+        settleElapsedRef.current = 0;
+        settledRef.current = false;
+        settlingRef.current = false;
       }
 
-      // Constraint solver: jaga jarak antar titik bertetangga tetap =
-      // panjang 1 segmen. Diulang beberapa iterasi supaya seluruh rantai
-      // konsisten (bukan cuma pasangan terakhir yang diproses).
-      for (let iter = 0; iter < iterations; iter++) {
-        xs.current[0] = 0;
-        ys.current[0] = 0;
-        for (let i = 0; i < N; i++) {
-          const dx = xs.current[i + 1] - xs.current[i];
-          const dy = ys.current[i + 1] - ys.current[i];
-          const dist = Math.hypot(dx, dy) || 0.0001;
-          const diff = (dist - segLen) / dist;
-          const pinned0 = i === 0;
-          const pinned1 = dragging && i + 1 === N;
-          const inv0 = pinned0 ? 0 : 1;
-          const inv1 = pinned1 ? 0 : 1;
-          const total = inv0 + inv1 || 1;
-          const move0 = (inv0 / total) * diff;
-          const move1 = (inv1 / total) * diff;
-          xs.current[i] += dx * move0;
-          ys.current[i] += dy * move0;
-          xs.current[i + 1] -= dx * move1;
-          ys.current[i + 1] -= dy * move1;
+      if (settledRef.current && !dragging) {
+        for (let i = 0; i <= N; i++) {
+          xs.current[i] = 0;
+          ys.current[i] = i * segLen;
+          pxs.current[i] = xs.current[i];
+          pys.current[i] = ys.current[i];
         }
+      } else if (settlingRef.current && !dragging) {
+        settleElapsedRef.current += dt;
+        const settleProgress = Math.max(
+          0,
+          Math.min(1, settleElapsedRef.current / settleDurationRef.current)
+        );
+        const settleEase = settleProgress * settleProgress * (3 - 2 * settleProgress);
+        for (let i = 0; i <= N; i++) {
+          xs.current[i] = settleStartX.current[i] * (1 - settleEase);
+          ys.current[i] = settleStartY.current[i] + (i * segLen - settleStartY.current[i]) * settleEase;
+          pxs.current[i] = xs.current[i];
+          pys.current[i] = ys.current[i];
+        }
+        if (settleProgress === 1) {
+          settlingRef.current = false;
+          settledRef.current = true;
+        }
+      } else {
+        // Keep the rope lively while dragging; after release, momentum and
+        // gravity alone determine how long the swing takes to calm down.
+        for (let i = 1; i <= N; i++) {
+          if (dragging && i === N) continue;
+          const vx = (xs.current[i] - pxs.current[i]) * damping;
+          const vy = (ys.current[i] - pys.current[i]) * damping;
+          const progress = i / N;
+          const windWave =
+            Math.sin(timeRef.current * 1.35 - i * 0.78) +
+            Math.sin(timeRef.current * 2.25 + i * 1.3) * 0.42;
+          const wind = dragging ? windWave * progress * windAmplitude : 0;
+          const nx = xs.current[i] + vx + wind * dt * dt;
+          const ny = ys.current[i] + vy + g * (0.25 + progress * 0.75) * dt * dt;
+          pxs.current[i] = xs.current[i];
+          pys.current[i] = ys.current[i];
+          xs.current[i] = nx;
+          ys.current[i] = ny;
+        }
+
         if (dragging) {
+          pxs.current[N] = xs.current[N];
+          pys.current[N] = ys.current[N];
           xs.current[N] = pointerTarget.current.x;
           ys.current[N] = pointerTarget.current.y;
         }
+
+        // Keep adjacent rope points at a consistent distance.
+        for (let iter = 0; iter < iterations; iter++) {
+          xs.current[0] = 0;
+          ys.current[0] = 0;
+          for (let i = 0; i < N; i++) {
+            const dx = xs.current[i + 1] - xs.current[i];
+            const dy = ys.current[i + 1] - ys.current[i];
+            const dist = Math.hypot(dx, dy) || 0.0001;
+            const diff = (dist - segLen) / dist;
+            const pinned0 = i === 0;
+            const pinned1 = dragging && i + 1 === N;
+            const inv0 = pinned0 ? 0 : 1;
+            const inv1 = pinned1 ? 0 : 1;
+            const total = inv0 + inv1 || 1;
+            const move0 = (inv0 / total) * diff;
+            const move1 = (inv1 / total) * diff;
+            xs.current[i] += dx * move0;
+            ys.current[i] += dy * move0;
+            xs.current[i + 1] -= dx * move1;
+            ys.current[i + 1] -= dy * move1;
+          }
+          if (dragging) {
+            xs.current[N] = pointerTarget.current.x;
+            ys.current[N] = pointerTarget.current.y;
+          }
+        }
+
+        if (!dragging && !settledRef.current) {
+          let maxSpeed = 0;
+          let maxHorizontal = 0;
+          for (let i = 1; i <= N; i++) {
+            maxSpeed = Math.max(
+              maxSpeed,
+              Math.hypot(xs.current[i] - pxs.current[i], ys.current[i] - pys.current[i])
+            );
+            maxHorizontal = Math.max(maxHorizontal, Math.abs(xs.current[i]));
+          }
+
+          const calm = maxSpeed < 0.2 && maxHorizontal < Math.max(1.5, segLen * 0.015);
+          calmTimeRef.current = calm ? calmTimeRef.current + dt : 0;
+          if (!settlingRef.current && calmTimeRef.current >= 0.18) {
+            settleStartX.current.set(xs.current);
+            settleStartY.current.set(ys.current);
+            settleElapsedRef.current = 0;
+            settleDurationRef.current = Math.max(
+              0.35,
+              Math.min(1.1, 0.35 + (maxHorizontal / length) * 0.8 + maxSpeed * 0.025)
+            );
+            settlingRef.current = true;
+          }
+        }
+
       }
       xs.current[0] = 0;
       ys.current[0] = 0;
@@ -184,9 +260,21 @@ export function useRopePhysics(opts: RopePhysicsOptions, callbacks: RopePhysicsC
         const endY = ys.current[N];
         const segDx = xs.current[N] - xs.current[N - 1];
         const segDy = Math.max(ys.current[N] - ys.current[N - 1], 0.0001);
-        let angle = (Math.atan2(segDx, segDy) * 180) / Math.PI;
-        angle = Math.max(-18, Math.min(18, angle));
-        cardEl.style.transform = `translate3d(${endX - halfW}px, ${endY}px, 0) rotate(${angle}deg)`;
+        const targetAngle = Math.max(-26, Math.min(26, (Math.atan2(segDx, segDy) * 180) / Math.PI));
+        const rendered = renderedCard.current;
+        if (!rendered.initialized) {
+          rendered.x = endX - halfW;
+          rendered.y = endY;
+          rendered.angle = targetAngle;
+          rendered.initialized = true;
+        } else {
+          const smoothing = dragging ? 1 : 1 - Math.exp(-dt * 14);
+          rendered.x += (endX - halfW - rendered.x) * smoothing;
+          rendered.y += (endY - rendered.y) * smoothing;
+          rendered.angle += (targetAngle - rendered.angle) * smoothing;
+        }
+        cardEl.style.transform = `translate3d(${rendered.x}px, ${rendered.y}px, 0) rotate(${rendered.angle}deg)`;
+        const angle = rendered.angle;
         const shadowBlur = 10 + Math.abs(angle) * 0.4;
         const shadowY = 16 + Math.min(Math.abs(endY) * 0.02, 10);
         cardEl.style.filter = `drop-shadow(${angle * 0.7}px ${shadowY}px ${shadowBlur}px rgba(0,0,0,0.38))`;
@@ -210,9 +298,21 @@ export function useRopePhysics(opts: RopePhysicsOptions, callbacks: RopePhysicsC
       (e.currentTarget as Element).setPointerCapture(e.pointerId);
       updateAnchorClient();
       draggingRef.current = true;
-      movedRef.current = false;
-      pointerStartClient.current = { x: e.clientX, y: e.clientY };
-      if (cardWrapRef.current) cardHalfWidthRef.current = cardWrapRef.current.offsetWidth / 2;
+      const card = cardWrapRef.current;
+      if (card) {
+        cardHalfWidthRef.current = card.offsetWidth / 2;
+        const rect = card.getBoundingClientRect();
+        pointerGrabOffset.current = {
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top,
+        };
+        pointerTarget.current = {
+          x: rect.left + rect.width / 2 - anchorClient.current.x,
+          y: rect.top - anchorClient.current.y,
+        };
+      }
+      pointerVelocity.current = { x: 0, y: 0 };
+      lastPointerMove.current.time = e.timeStamp;
       callbacksRef.current.onGrabChange?.(true);
     },
     [updateAnchorClient]
@@ -220,30 +320,40 @@ export function useRopePhysics(opts: RopePhysicsOptions, callbacks: RopePhysicsC
 
   const onPointerMove = useCallback((e: React.PointerEvent) => {
     if (!draggingRef.current) return;
-    const dx0 = e.clientX - pointerStartClient.current.x;
-    const dy0 = e.clientY - pointerStartClient.current.y;
-    if (!movedRef.current && Math.hypot(dx0, dy0) > 6) movedRef.current = true;
-
-    let localX = e.clientX - anchorClient.current.x;
-    let localY = e.clientY - anchorClient.current.y;
+    const localX =
+      e.clientX - pointerGrabOffset.current.x + cardHalfWidthRef.current - anchorClient.current.x;
+    const localY = e.clientY - pointerGrabOffset.current.y - anchorClient.current.y;
     const maxReach = optsRef.current.getMaxReach?.() ?? optsRef.current.getLength() * 1.02;
-    const dist = Math.hypot(localX, localY);
+    let targetX = localX;
+    let targetY = localY;
+    const dist = Math.hypot(targetX, targetY);
     if (dist > maxReach) {
       const scale = maxReach / dist;
-      localX *= scale;
-      localY *= scale;
+      targetX *= scale;
+      targetY *= scale;
     }
-    pointerTarget.current = { x: localX, y: localY };
+    const elapsed = Math.max(8, e.timeStamp - lastPointerMove.current.time);
+    const velocityScale = 16.67 / elapsed;
+    let velocityX = (targetX - pointerTarget.current.x) * velocityScale;
+    let velocityY = (targetY - pointerTarget.current.y) * velocityScale;
+    const velocityMagnitude = Math.hypot(velocityX, velocityY);
+    const maxVelocity = 32;
+    if (velocityMagnitude > maxVelocity) {
+      velocityX *= maxVelocity / velocityMagnitude;
+      velocityY *= maxVelocity / velocityMagnitude;
+    }
+    pointerVelocity.current = { x: velocityX, y: velocityY };
+    pointerTarget.current = { x: targetX, y: targetY };
+    lastPointerMove.current.time = e.timeStamp;
   }, []);
 
   const endDrag = useCallback(() => {
     if (!draggingRef.current) return;
     draggingRef.current = false;
+    pxs.current[N] = xs.current[N] - pointerVelocity.current.x * 0.8;
+    pys.current[N] = ys.current[N] - pointerVelocity.current.y * 0.8;
     callbacksRef.current.onGrabChange?.(false);
-    const wasTap = !movedRef.current;
-    movedRef.current = false;
-    if (wasTap) callbacksRef.current.onTap?.();
-  }, []);
+  }, [N]);
 
   return {
     stageRef,

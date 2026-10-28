@@ -35,12 +35,14 @@
   padding: 4px;
   border-radius: 11px;
   object-fit: contain;
-  background: var(--bg-panel-alt);
+  background: transparent;
+  mix-blend-mode: multiply;
   filter: none;
 }
 
 [data-theme="dark"] .logo {
   filter: invert(1) brightness(1.15);
+  mix-blend-mode: screen;
 }
 
 .brand {

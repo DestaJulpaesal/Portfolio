@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { ImagePlus, Loader2, X } from "lucide-react";
-import { uploadMedia } from "../../lib/supabase";
+import { uploadMedia } from "../../lib/api";
 import { useToast } from "../ToastContext";
 import styles from "./ImageUploadField.module.css";
 

@@ -1,21 +1,18 @@
 import { useEffect, useState } from "react";
-import { isSupabaseConfigured } from "../lib/supabase";
 import { fetchProjects, fetchCertifications, type ProjectRow, type CertificationRow } from "../lib/adminData";
 import { projects as staticProjects, certifications as staticCertifications } from "../data/content";
 
 /**
- * Ambil daftar proyek dari Supabase (kalau sudah dikonfigurasi & tabelnya
- * sudah ada) supaya perubahan dari halaman /admin langsung tampil di
- * halaman publik. Kalau Supabase belum di-setup, atau query gagal (mis.
- * tabel belum dibuat), otomatis fallback ke data statis di content.ts
+ * Ambil daftar proyek dari API PostgreSQL supaya perubahan dari halaman
+ * /admin langsung tampil di halaman publik. Kalau API belum tersedia atau
+ * query gagal, otomatis fallback ke data statis di content.ts
  * supaya situs tidak pernah tampil kosong/error ke pengunjung.
  */
 export function useProjects() {
   const [projects, setProjects] = useState<ProjectRow[] | typeof staticProjects>(staticProjects);
-  const [loading, setLoading] = useState(isSupabaseConfigured);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return;
     let cancelled = false;
 
     fetchProjects()
@@ -23,7 +20,7 @@ export function useProjects() {
         if (!cancelled && rows.length > 0) setProjects(rows);
       })
       .catch(() => {
-        // Tabel belum dibuat / query gagal — diam-diam pakai fallback statis.
+        // Keep the published portfolio available while the API is offline.
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -41,10 +38,9 @@ export function useCertifications() {
   const [certifications, setCertifications] = useState<
     CertificationRow[] | typeof staticCertifications
   >(staticCertifications);
-  const [loading, setLoading] = useState(isSupabaseConfigured);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return;
     let cancelled = false;
 
     fetchCertifications()
@@ -52,7 +48,7 @@ export function useCertifications() {
         if (!cancelled && rows.length > 0) setCertifications(rows);
       })
       .catch(() => {
-        // Tabel belum dibuat / query gagal — diam-diam pakai fallback statis.
+        // Keep the published portfolio available while the API is offline.
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
