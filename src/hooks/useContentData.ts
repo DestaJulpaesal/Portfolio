@@ -1,15 +1,8 @@
 import { useEffect, useState } from "react";
 import { fetchProjects, fetchCertifications, type ProjectRow, type CertificationRow } from "../lib/adminData";
-import { projects as staticProjects, certifications as staticCertifications } from "../data/content";
 
-/**
- * Ambil daftar proyek dari API PostgreSQL supaya perubahan dari halaman
- * /admin langsung tampil di halaman publik. Kalau API belum tersedia atau
- * query gagal, otomatis fallback ke data statis di content.ts
- * supaya situs tidak pernah tampil kosong/error ke pengunjung.
- */
 export function useProjects() {
-  const [projects, setProjects] = useState<ProjectRow[] | typeof staticProjects>(staticProjects);
+  const [projects, setProjects] = useState<ProjectRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,7 +10,7 @@ export function useProjects() {
 
     fetchProjects()
       .then((rows) => {
-        if (!cancelled && rows.length > 0) setProjects(rows);
+        if (!cancelled) setProjects(rows);
       })
       .catch(() => {
         // Keep the published portfolio available while the API is offline.
@@ -35,9 +28,7 @@ export function useProjects() {
 }
 
 export function useCertifications() {
-  const [certifications, setCertifications] = useState<
-    CertificationRow[] | typeof staticCertifications
-  >(staticCertifications);
+  const [certifications, setCertifications] = useState<CertificationRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,7 +36,7 @@ export function useCertifications() {
 
     fetchCertifications()
       .then((rows) => {
-        if (!cancelled && rows.length > 0) setCertifications(rows);
+        if (!cancelled) setCertifications(rows);
       })
       .catch(() => {
         // Keep the published portfolio available while the API is offline.

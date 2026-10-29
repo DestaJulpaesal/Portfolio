@@ -37,13 +37,6 @@
   fill: none;
 }
 
-.subjectCell {
-  max-width: 220px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .dateCell {
   white-space: nowrap;
   color: var(--text-muted);

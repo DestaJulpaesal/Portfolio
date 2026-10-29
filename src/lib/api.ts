@@ -1,7 +1,6 @@
 export interface ContactMessagePayload {
   name: string;
-  email: string;
-  subject: string;
+  email?: string;
   message: string;
 }
 

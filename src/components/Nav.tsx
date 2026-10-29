@@ -4,7 +4,6 @@ import { ArrowRight, Download, Menu, X } from "lucide-react";
 import { hasRealUrl } from "../data/content";
 import { useProfileContent } from "../hooks/useSiteContent";
 import { MagneticButton } from "./ui/MagneticButton";
-import { ThemeToggle } from "./ui/ThemeToggle";
 import styles from "./Nav.module.css";
 
 const links = [
@@ -85,8 +84,6 @@ export function Nav() {
         </nav>
 
         <div className={styles.actions}>
-          <ThemeToggle className={styles.themeToggleGap} />
-
           {hasRealUrl(profile.cvUrl) ? (
             <MagneticButton href={profile.cvUrl} variant="ghost" className={styles.cta} download>
               <Download size={14} /> Download CV

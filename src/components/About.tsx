@@ -10,7 +10,7 @@ export function About() {
   const { about } = useAboutContent();
 
   return (
-    <section id="about" className={styles.aboutSection}>
+    <section id="about" className={`${styles.aboutSection} reveal`}>
       <div className={`container ${styles.container}`}>
         <div className={styles.sectionHeader}>
           <p className={`mono ${styles.eyebrow}`}>

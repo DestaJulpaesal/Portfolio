@@ -9,12 +9,6 @@ import {
   type SkillsData,
 } from "../data/content";
 
-/**
- * Sama seperti useProjects/useCertifications di useContentData.ts: ambil
- * override dari API PostgreSQL (tabel "site_content") kalau server tersedia,
- * dan diam-diam fallback ke data statis di content.ts kalau belum di-setup
- * atau baris untuk section itu belum pernah disimpan lewat /admin.
- */
 function useSiteSection<T>(section: "profile" | "about" | "skills", getDefault: () => T) {
   const [data, setData] = useState<T>(getDefault);
   const [loading, setLoading] = useState(true);

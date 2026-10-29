@@ -129,15 +129,6 @@
   flex-shrink: 0;
 }
 
-.themeToggleGap {
-  margin-right: 3px;
-  width: 34px;
-  height: 34px;
-  border-color: rgba(93, 255, 195, 0.18);
-  background: rgba(3, 25, 18, 0.56);
-  color: #e8f7ef;
-}
-
 .cta {
   flex-shrink: 0;
   min-height: 38px;

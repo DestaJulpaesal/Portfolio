@@ -1,4 +1,4 @@
-import { motion, useDragControls } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -7,6 +7,7 @@ import {
   Linkedin,
 } from "lucide-react";
 import { useProfileContent } from "../hooks/useSiteContent";
+import { useTypewriter } from "../hooks/useTypewriter";
 import { MagneticButton } from "./ui/MagneticButton";
 import { TikTokIcon, WhatsAppIcon } from "./icons/BrandIcons";
 import styles from "./Hero.module.css";
@@ -19,21 +20,12 @@ const socialIcons = {
   whatsapp: WhatsAppIcon,
 };
 
-const codeTextureLines = [
-  "const user = await load();",
-  "if (!user) return null;",
-  "export function Profile() {",
-  "  return <section>",
-  "    data.map(render);",
-  "    const result = fetch();",
-  "    return result.json();",
-  "  </section>",
-  "}",
-];
-
 export function Hero() {
   const { profile, loading } = useProfileContent();
-  const portraitDragControls = useDragControls();
+  const { displayed, activeLine, done } = useTypewriter(
+    [profile.name.toUpperCase(), profile.headlineAccent],
+    { speed: 48, lineDelay: 220, startDelay: 250 }
+  );
 
   if (loading) {
     return (
@@ -67,9 +59,19 @@ export function Hero() {
             HELLO, I’M
           </p>
 
-          <h1 className={styles.title}>
-            <span className={styles.name}>{profile.name.toUpperCase()}</span>
-            <span className={styles.headline}>{profile.headlineAccent}</span>
+          <h1 className={styles.title} aria-label={`${profile.name}, ${profile.headlineAccent}`}>
+            <span className={styles.titleMask}>
+              <span className={styles.name} aria-hidden="true">
+                {displayed[0]}
+                {activeLine === 0 && !done && <span className={styles.typeCursor} />}
+              </span>
+            </span>
+            <span className={styles.titleMask}>
+              <span className={styles.headline} aria-hidden="true">
+                {displayed[1]}
+                {activeLine === 1 && !done && <span className={styles.typeCursor} />}
+              </span>
+            </span>
           </h1>
 
           <p className={styles.tagline}>{profile.tagline}</p>
@@ -83,49 +85,6 @@ export function Hero() {
               Tentang Saya
             </a>
           </div>
-
-        </motion.div>
-
-        <motion.div
-          className={styles.portraitFrame}
-          drag
-          dragListener={false}
-          dragControls={portraitDragControls}
-          dragConstraints={{ left: -90, right: 90, top: -50, bottom: 0 }}
-          dragElastic={0.12}
-          dragMomentum
-          whileDrag={{ scale: 1.015, cursor: "grabbing" }}
-          initial={{ opacity: 0, y: 22 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <img
-            src={profile.photo || "/projects/hero-reference.webp"}
-            alt={`Potret ${profile.name}`}
-            className={`${styles.portrait} ${styles[`photo-${profile.photoFilter ?? "natural"}`]}`}
-            draggable={false}
-            onPointerDown={(event) => portraitDragControls.start(event)}
-          />
-          <motion.span
-            className={styles.codeTextureMask}
-            aria-hidden="true"
-            title="Seret untuk mengatur posisi tekstur kode"
-            drag
-            dragConstraints={{ left: -90, right: 90, top: -90, bottom: 90 }}
-            dragElastic={0.08}
-            dragMomentum={false}
-            whileDrag={{ cursor: "grabbing" }}
-          >
-            <pre className={styles.codeTexture}>
-              {Array.from(
-                { length: 48 },
-                (_, index) => codeTextureLines[index % codeTextureLines.length],
-              ).join("\n")}
-            </pre>
-          </motion.span>
-        </motion.div>
-
-        <div className={styles.profilePanel}>
           <nav className={styles.socialLinks} aria-label="Media sosial">
             {profile.socials.map((social) => {
               const Icon = socialIcons[social.icon];
@@ -143,7 +102,22 @@ export function Hero() {
               );
             })}
           </nav>
-        </div>
+        </motion.div>
+
+        <motion.div
+          className={styles.portraitFrame}
+          initial={{ opacity: 0, y: 22 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <img
+            src={profile.photo || "/projects/hero-reference.webp"}
+            alt={`Potret ${profile.name}`}
+            className={`${styles.portrait} ${styles[`photo-${profile.photoFilter ?? "natural"}`]}`}
+            draggable={false}
+          />
+        </motion.div>
+
       </div>
     </section>
   );

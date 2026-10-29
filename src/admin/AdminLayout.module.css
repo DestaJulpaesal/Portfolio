@@ -9,15 +9,19 @@
 }
 
 .sidebar {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
   z-index: 20;
   display: flex;
   width: 264px;
   height: 100vh;
+  height: 100dvh;
   flex: 0 0 264px;
   flex-direction: column;
   padding: 22px 14px 16px;
+  box-sizing: border-box;
+  overflow: hidden;
   background: color-mix(in srgb, var(--bg-panel) 96%, transparent);
   border-right: 1px solid var(--border);
   box-shadow: 12px 0 36px rgba(0, 0, 0, 0.08);
@@ -344,6 +348,7 @@
   max-width: 1500px;
   min-width: 0;
   flex: 1;
+  margin-left: 264px;
   padding: clamp(28px, 4vw, 52px) clamp(24px, 5vw, 72px) 72px;
 }
 
@@ -378,6 +383,7 @@
   }
 
   .content {
+    margin-left: 0;
     padding: 80px 18px 48px;
   }
 }

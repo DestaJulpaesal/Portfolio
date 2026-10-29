@@ -1,12 +1,13 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Navigate } from "react-router-dom";
 import { LogIn, Loader2, AlertCircle, ShieldAlert, Lock } from "lucide-react";
-import { profile } from "../../data/content";
+import { useProfileContent } from "../../hooks/useSiteContent";
 import { useAdminAuth } from "../AdminAuthContext";
 import { getLoginLockout, registerFailedAttempt, resetLoginAttempts } from "../loginRateLimit";
 import styles from "./Login.module.css";
 
 export function Login() {
+  const { profile } = useProfileContent();
   const { session, configured, signIn, loading } = useAdminAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

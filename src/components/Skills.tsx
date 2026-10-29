@@ -6,14 +6,28 @@ import { skillIconMap } from "./skillIcons";
 import styles from "./Skills.module.css";
 
 export function Skills() {
-  const { categories: skillCategories } = useSkillsContent();
+  const { categories: skillCategories, loading } = useSkillsContent();
   const [active, setActive] = useState(0);
   const activeCategory = skillCategories[Math.min(active, skillCategories.length - 1)] ?? skillCategories[0];
 
-  if (!activeCategory) return null;
+  if (!activeCategory) {
+    return (
+      <section id="skills" className="reveal">
+        <div className="container">
+          <p className={`mono ${styles.eyebrow}`}>
+            <span className={styles.number}>02</span> Skills &amp; Stack
+          </p>
+          <h2 className={styles.heading}>My Expertise — dikelompokkan per kategori</h2>
+          <p className={styles.note} aria-live="polite">
+            {loading ? "Memuat daftar skill..." : "Belum ada skill yang ditambahkan."}
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section id="skills">
+    <section id="skills" className="reveal">
       <div className="container">
         <motion.p
           className={`mono ${styles.eyebrow}`}
@@ -84,7 +98,6 @@ export function Skills() {
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] }}
-                      whileHover={{ y: -4 }}
                       className={styles.badge}
                     >
                       <Icon size={26} color={color} />

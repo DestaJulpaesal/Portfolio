@@ -21,7 +21,7 @@ export function Certifications() {
   }
 
   return (
-    <section id="certifications">
+    <section id="certifications" className="reveal">
       <div className="container">
         <p className={`mono ${styles.eyebrow}`}>
           <span className={styles.number}>04</span> Sertifikasi &amp; CV

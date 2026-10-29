@@ -41,7 +41,7 @@ export function Projects() {
   const [activeProject, setActiveProject] = useState<Project | null>(null);
 
   return (
-    <section id="work">
+    <section id="work" className="reveal">
       <div className="container">
         <div className={styles.headRow}>
           <div>

@@ -9,11 +9,12 @@ import {
   type CertificationRow,
   type MessageRow,
 } from "../../lib/adminData";
-import { profile } from "../../data/content";
+import { useProfileContent } from "../../hooks/useSiteContent";
 import shared from "./AdminPage.module.css";
 import styles from "./Dashboard.module.css";
 
 export function Dashboard() {
+  const { profile } = useProfileContent();
   const [projects, setProjects] = useState<ProjectRow[] | null>(null);
   const [certifications, setCertifications] = useState<CertificationRow[] | null>(null);
   const [messages, setMessages] = useState<MessageRow[] | null>(null);

@@ -34,7 +34,7 @@ const tables = {
     defaults: { description: "", sort_order: 0 },
   },
   messages: {
-    columns: ["id", "name", "email", "subject", "message", "is_read", "created_at", "read_at"],
+    columns: ["id", "name", "email", "message", "is_read", "created_at", "read_at"],
     defaults: { is_read: false },
   },
   site_content: {

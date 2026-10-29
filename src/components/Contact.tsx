@@ -9,7 +9,6 @@ import {
   CheckCircle2,
   AlertCircle,
   User,
-  Tag,
   MessageSquare,
   ArrowUpRight,
 } from "lucide-react";
@@ -36,7 +35,7 @@ export function Contact() {
     },
     {
       icon: Phone,
-      label: "Phone",
+      label: "Telepon",
       value: profile.phone,
       href: `tel:${profile.phone.replace(/\s|x/g, "")}`,
     },
@@ -55,7 +54,7 @@ export function Contact() {
   ];
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
-  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -64,7 +63,7 @@ export function Contact() {
     try {
       await sendContactMessage(form);
       setStatus("success");
-      setForm({ name: "", email: "", subject: "", message: "" });
+      setForm({ name: "", email: "", message: "" });
     } catch (err) {
       setStatus("error");
       setErrorMsg(err instanceof Error ? err.message : "Gagal mengirim pesan.");
@@ -72,7 +71,7 @@ export function Contact() {
   }
 
   return (
-    <section id="contact">
+    <section id="contact" className="reveal">
       <div className="container">
         <div className={styles.grid}>
           <motion.div
@@ -81,8 +80,8 @@ export function Contact() {
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className={`mono ${styles.eyebrow}`}>
-              <span className={styles.number}>05</span> Get In Touch
+              <p className={`mono ${styles.eyebrow}`}>
+                <span className={styles.number}>05</span> Hubungi Saya
             </p>
             <h2 className={styles.heading}>{contactInfo.heading}</h2>
             <p className={styles.subheading}>{contactInfo.subheading}</p>
@@ -144,7 +143,7 @@ export function Contact() {
 
             <div className={styles.row}>
               <div className={styles.field}>
-                <label htmlFor="name">Nama Kamu</label>
+                <label htmlFor="name">Nama</label>
                 <div className={styles.inputWrap}>
                   <User size={15} className={styles.inputIcon} />
                   <input
@@ -152,36 +151,26 @@ export function Contact() {
                     required
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    placeholder="Nama Kamu"
+                    onInvalid={(e) => e.currentTarget.setCustomValidity("Nama wajib diisi.")}
+                    onInput={(e) => e.currentTarget.setCustomValidity("")}
+                    placeholder="Masukkan nama kamu"
                   />
                 </div>
               </div>
               <div className={styles.field}>
-                <label htmlFor="email">Email Kamu</label>
+                <label htmlFor="email">Email (opsional)</label>
                 <div className={styles.inputWrap}>
                   <Mail size={15} className={styles.inputIcon} />
                   <input
                     id="email"
                     type="email"
-                    required
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    onInvalid={(e) => e.currentTarget.setCustomValidity("Format email belum benar. Contoh: nama@email.com.")}
+                    onInput={(e) => e.currentTarget.setCustomValidity("")}
                     placeholder="nama@email.com"
                   />
                 </div>
-              </div>
-            </div>
-
-            <div className={styles.field}>
-              <label htmlFor="subject">Subjek</label>
-              <div className={styles.inputWrap}>
-                <Tag size={15} className={styles.inputIcon} />
-                <input
-                  id="subject"
-                  value={form.subject}
-                  onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                  placeholder="Subjek"
-                />
               </div>
             </div>
 
@@ -195,7 +184,9 @@ export function Contact() {
                   rows={5}
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  placeholder="Ceritakan proyekmu..."
+                  onInvalid={(e) => e.currentTarget.setCustomValidity("Pesan wajib diisi.")}
+                  onInput={(e) => e.currentTarget.setCustomValidity("")}
+                  placeholder="Tuliskan pesan atau ceritakan proyekmu..."
                 />
               </div>
             </div>
@@ -203,18 +194,18 @@ export function Contact() {
             <button type="submit" className={styles.submit} disabled={status === "loading"}>
               {status === "loading" ? (
                 <>
-                  <Loader2 size={16} className={styles.spin} /> Mengirim...
+                  <Loader2 size={16} className={styles.spin} /> Mengirim pesan...
                 </>
               ) : (
                 <>
-                  Send Message <Send size={16} />
+                  Kirim Pesan <Send size={16} />
                 </>
               )}
             </button>
 
             {status === "success" && (
               <p className={styles.success}>
-                <CheckCircle2 size={15} /> Pesan terkirim, terima kasih!
+                <CheckCircle2 size={15} /> Pesan berhasil dikirim. Terima kasih!
               </p>
             )}
             {status === "error" && (

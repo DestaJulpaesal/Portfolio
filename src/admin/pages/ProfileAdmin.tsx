@@ -213,6 +213,28 @@ export function ProfileAdmin() {
             </div>
 
             <div className={`${shared.field} ${shared.fullWidth}`}>
+              <label htmlFor="pr-browser-title">Judul tab browser (opsional)</label>
+              <input
+                id="pr-browser-title"
+                type="text"
+                value={form.browserTitle ?? ""}
+                onChange={(e) => update("browserTitle", e.target.value)}
+                placeholder={`${form.name}${form.role ? ` — ${form.role}` : ""}`}
+                maxLength={120}
+              />
+            </div>
+
+            <div className={`${shared.field} ${shared.fullWidth}`}>
+              <ImageUploadField
+                id="pr-favicon"
+                label="Ikon tab browser / favicon (PNG disarankan)"
+                value={form.faviconUrl ?? ""}
+                onChange={(value) => update("faviconUrl", value)}
+                folder="profile"
+              />
+            </div>
+
+            <div className={`${shared.field} ${shared.fullWidth}`}>
               <ImageUploadField
                 id="pr-photo"
                 label="Foto Hero (PNG/WebP tanpa latar direkomendasikan)"

@@ -64,8 +64,7 @@ export function MessagesAdmin() {
       const matchesSearch =
         !q ||
         m.name.toLowerCase().includes(q) ||
-        m.email.toLowerCase().includes(q) ||
-        (m.subject ?? "").toLowerCase().includes(q) ||
+        (m.email ?? "").toLowerCase().includes(q) ||
         m.message.toLowerCase().includes(q);
       const matchesStatus =
         statusFilter === "all" ||
@@ -118,9 +117,9 @@ export function MessagesAdmin() {
     <div>
       <header className={shared.pageHeader}>
         <div>
-          <h1 className={shared.pageTitle}>Messages</h1>
+            <h1 className={shared.pageTitle}>Pesan Masuk</h1>
           <p className={shared.pageSubtitle}>
-            Pesan yang masuk lewat form Contact di halaman utama.
+            Pesan yang dikirim melalui formulir kontak di halaman utama.
             {unreadCount > 0 && (
               <>
                 {" "}
@@ -138,7 +137,7 @@ export function MessagesAdmin() {
           <Search size={15} />
           <input
             type="text"
-            placeholder="Cari nama, email, subjek, atau isi pesan…"
+            placeholder="Cari nama, email, atau isi pesan..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             aria-label="Cari pesan"
@@ -159,15 +158,15 @@ export function MessagesAdmin() {
       <div className={shared.tableWrap}>
         {rows === null ? (
           <div className={shared.loadingCell}>
-            <Loader2 size={18} className={shared.spin} /> Memuat pesan…
+            <Loader2 size={18} className={shared.spin} /> Memuat pesan...
           </div>
         ) : filtered.length === 0 ? (
           <div className={shared.emptyState}>
             <Inbox size={30} />
             <p>
               {rows.length === 0
-                ? "Belum ada pesan masuk dari form Contact."
-                : "Tidak ada pesan yang cocok dengan pencarian/filter."}
+                ? "Belum ada pesan masuk dari formulir kontak."
+                : "Pesan tidak ditemukan. Coba ubah kata pencarian atau filter."}
             </p>
           </div>
         ) : (
@@ -176,9 +175,8 @@ export function MessagesAdmin() {
               <tr>
                 <th></th>
                 <th>Pengirim</th>
-                <th>Subjek</th>
                 <th>Tanggal</th>
-                <th style={{ textAlign: "right" }}>Aksi</th>
+                <th style={{ textAlign: "right" }}>Tindakan</th>
               </tr>
             </thead>
             <tbody>
@@ -202,11 +200,10 @@ export function MessagesAdmin() {
                       </span>
                       <div className={shared.nameText}>
                         <strong>{m.name}</strong>
-                        <span>{m.email}</span>
+                        <span>{m.email || "Email tidak dicantumkan"}</span>
                       </div>
                     </div>
                   </td>
-                  <td className={styles.subjectCell}>{m.subject || "(tanpa subjek)"}</td>
                   <td className={styles.dateCell}>{formatDate(m.created_at)}</td>
                   <td>
                     <div className={shared.actionsCell}>
@@ -240,24 +237,27 @@ export function MessagesAdmin() {
       <Modal open={!!active} onClose={() => setActive(null)}>
         {active && (
           <div className={styles.detail}>
-            <h2 className={styles.detailTitle}>{active.subject || "(tanpa subjek)"}</h2>
+            <h2 className={styles.detailTitle}>Pesan dari {active.name}</h2>
             <div className={styles.detailMeta}>
               <span>
-                <strong>{active.name}</strong> · {active.email}
+                <strong>{active.name}</strong>
+                {active.email && <> · {active.email}</>}
               </span>
               <span>{formatDate(active.created_at)}</span>
             </div>
             <p className={styles.detailMessage}>{active.message}</p>
             <div className={styles.detailActions}>
-              <a href={`mailto:${active.email}`} className={shared.secondaryBtn}>
-                <Mail size={14} /> Balas via Email
-              </a>
+              {active.email && (
+                <a href={`mailto:${active.email}`} className={shared.secondaryBtn}>
+                  <Mail size={14} /> Balas melalui email
+                </a>
+              )}
               <button
                 type="button"
                 className={`${shared.secondaryBtn} ${shared.dangerHover}`}
                 onClick={() => setPendingDelete(active)}
               >
-                <Trash2 size={14} /> Hapus
+                <Trash2 size={14} /> Hapus pesan
               </button>
             </div>
           </div>
@@ -267,7 +267,7 @@ export function MessagesAdmin() {
       <ConfirmDialog
         open={!!pendingDelete}
         title="Hapus pesan ini?"
-        description={`Pesan dari "${pendingDelete?.name}" akan dihapus permanen.`}
+        description={`Pesan dari "${pendingDelete?.name}" akan dihapus secara permanen.`}
         busy={deleting}
         onConfirm={handleDelete}
         onCancel={() => setPendingDelete(null)}

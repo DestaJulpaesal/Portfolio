@@ -30,13 +30,15 @@ CREATE TABLE IF NOT EXISTS certifications (
 CREATE TABLE IF NOT EXISTS messages (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text NOT NULL,
-  email text NOT NULL,
-  subject text,
+  email text,
   message text NOT NULL,
   is_read boolean NOT NULL DEFAULT false,
   created_at timestamptz NOT NULL DEFAULT now(),
   read_at timestamptz
 );
+
+ALTER TABLE messages ALTER COLUMN email DROP NOT NULL;
+ALTER TABLE messages DROP COLUMN IF EXISTS subject;
 
 CREATE TABLE IF NOT EXISTS admin_users (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

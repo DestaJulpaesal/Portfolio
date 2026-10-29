@@ -14,11 +14,10 @@ import {
   Sparkles,
   ShieldCheck,
 } from "lucide-react";
-import { profile } from "../data/content";
+import { useProfileContent } from "../hooks/useSiteContent";
 import { useAdminAuth } from "./AdminAuthContext";
 import { useToast } from "./ToastContext";
 import { countUnreadMessages } from "../lib/adminData";
-import { ThemeToggle } from "../components/ui/ThemeToggle";
 import styles from "./AdminLayout.module.css";
 
 const mainNavItems = [
@@ -35,6 +34,7 @@ const contentNavItems = [
 ];
 
 export function AdminLayout({ children }: PropsWithChildren) {
+  const { profile } = useProfileContent();
   const { signOut, isOwner, session } = useAdminAuth();
   const { notify } = useToast();
   const navigate = useNavigate();
@@ -155,7 +155,6 @@ export function AdminLayout({ children }: PropsWithChildren) {
             <span className={styles.viewArrow}>↗</span>
           </a>
           <div className={styles.footerRow}>
-            <ThemeToggle />
             <button type="button" className={styles.logoutBtn} onClick={handleSignOut}>
               <LogOut size={15} /> Keluar
             </button>

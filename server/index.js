@@ -382,13 +382,12 @@ app.post("/api/messages", rateLimit(contactAttempts, 5, 60 * 60 * 1000), asyncRo
   const body = req.body || {};
   if (body.website) return res.status(204).end();
   const name = requireText(body.name, "Nama", 120);
-  const email = requireText(body.email, "Email", 254).toLowerCase();
-  const subject = optionalText(body.subject, "Subjek", 200);
+  const email = optionalText(body.email, "Email", 254)?.toLowerCase() ?? null;
   const message = requireText(body.message, "Pesan", 5000);
-  if (!emailPattern.test(email)) return sendError(res, 400, "Alamat email tidak valid.");
+  if (email && !emailPattern.test(email)) return sendError(res, 400, "Format alamat email tidak valid.");
   await pool.query(
-    "INSERT INTO messages (name,email,subject,message) VALUES ($1,$2,$3,$4)",
-    [name, email, subject, message]
+    "INSERT INTO messages (name,email,message) VALUES ($1,$2,$3)",
+    [name, email, message]
   );
   res.status(201).json({ status: "ok" });
 }));

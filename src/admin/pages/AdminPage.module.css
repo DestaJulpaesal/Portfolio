@@ -142,11 +142,13 @@
   background: var(--bg-panel);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
 }
 
 .table {
   width: 100%;
+  min-width: 680px;
   border-collapse: collapse;
   font-size: 0.86rem;
 }
@@ -428,6 +430,10 @@
   .table td {
     display: block;
     width: 100%;
+  }
+
+  .table {
+    min-width: 0;
   }
 
   .table tr {
