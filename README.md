@@ -33,6 +33,25 @@ Di server yang sudah memasang Docker Compose:
 
 Jangan publikasikan port PostgreSQL ke internet atau commit `.env`. Volume `postgres_data` menyimpan database dan `portfolio_uploads` menyimpan gambar yang diunggah. `docker compose down` mempertahankan volume; **jangan** gunakan `docker compose down -v` kecuali memang ingin menghapus data.
 
+## Deploy ke Vercel dengan Neon
+
+Vercel menjalankan API Express sebagai Function; Docker tetap bisa dipakai untuk pengembangan lokal. Neon menyimpan data PostgreSQL dan Vercel Blob menyimpan gambar upload agar tetap ada setelah Function selesai.
+
+1. Pastikan project Vercel memakai root repository ini dan build command `npm run build`.
+2. Tambahkan environment variables pada Vercel untuk Production dan Preview: `DATABASE_URL` (URL pooled Neon dengan SSL), `JWT_SECRET` (acak, minimal 32 karakter), `ADMIN_EMAIL`, `ADMIN_PASSWORD` (minimal 12 karakter), `COOKIE_SECURE=true`, dan `TRUST_PROXY=1`.
+3. Buat public Vercel Blob store, hubungkan ke project, lalu pastikan `BLOB_READ_WRITE_TOKEN` tersedia sebagai environment variable. Jangan gunakan prefix `VITE_` untuk secret.
+4. Sebelum deploy pertama, pindahkan gambar yang tersimpan di volume Docker lokal ke folder kerja:
+   ```powershell
+   docker cp portofolio-app-1:/app/uploads .\uploads
+   ```
+5. Untuk memperbarui referensi gambar yang sudah ada di Neon dan mengunggah file-file tersebut ke Blob, pull variable Vercel ke `.env` atau isi `BLOB_READ_WRITE_TOKEN`, lalu jalankan:
+   ```powershell
+   npm run migrate:uploads
+   ```
+6. Deploy melalui Vercel. Setelah berhasil, tes halaman publik, login admin, perubahan konten, dan upload gambar.
+
+`uploads/` dan `.env` diabaikan Git. Jangan pernah meng-commit token Blob atau connection string database. Function diatur ke region Singapore (`sin1`) agar dekat dengan project Neon Singapore. Neon Free dapat scale-to-zero saat idle sehingga request database pertama setelah idle mungkin lebih lambat.
+
 ## Memindahkan data dari Supabase
 
 Ekspor tabel berikut sebagai CSV dari Supabase Dashboard: `projects`, `certifications`, `messages`, dan `site_content`. Simpan file dengan nama tabelnya, misalnya `projects.csv`, di satu folder. Setelah container berjalan, jalankan dari PowerShell:
@@ -61,9 +80,12 @@ Halaman `/admin` mengelola proyek, sertifikasi, pesan kontak, profil, About, Ski
 server/
   index.js       API, autentikasi, validasi, dan upload
   schema.sql     schema PostgreSQL yang dibuat otomatis
+api/
+  [...path].js   adapter Vercel Function untuk API Express
 src/
   lib/api.ts     komunikasi frontend ke API
   lib/adminData.ts operasi data yang dipakai halaman admin dan publik
 scripts/
   import-supabase-csv.mjs  importer CSV Supabase
+  migrate-uploads-to-vercel-blob.mjs  migrasi gambar dari Docker ke Vercel Blob
 ```

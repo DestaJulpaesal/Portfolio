@@ -6,6 +6,7 @@ import helmet from "helmet";
 import jwt from "jsonwebtoken";
 import multer from "multer";
 import pg from "pg";
+import { put } from "@vercel/blob";
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -34,13 +35,19 @@ class HttpError extends Error {
 
 const pool = new Pool(
   process.env.DATABASE_URL
-    ? { connectionString: process.env.DATABASE_URL }
+    ? {
+        connectionString: process.env.DATABASE_URL,
+        max: process.env.VERCEL ? 3 : 10,
+        idleTimeoutMillis: 10_000,
+        connectionTimeoutMillis: 10_000,
+      }
     : {
         host: process.env.DB_HOST || "127.0.0.1",
         port: Number(process.env.DB_PORT || 5432),
         database: process.env.DB_NAME || "portfolio",
         user: process.env.DB_USER || "portfolio",
         password: process.env.DB_PASSWORD,
+        max: 10,
       }
 );
 const app = express();
@@ -535,34 +542,55 @@ app.post("/api/uploads", requireAuth, upload.single("file"), asyncRoute(async (r
     "image/avif": ".avif",
   }[req.file.mimetype];
   const filename = `${randomUUID()}${extension}`;
+  if (process.env.VERCEL) {
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      throw new HttpError(503, "Penyimpanan gambar belum dikonfigurasi.");
+    }
+    const blob = await put(`uploads/${folder}/${filename}`, req.file.buffer, {
+      access: "public",
+      contentType: req.file.mimetype,
+      addRandomSuffix: false,
+    });
+    return res.status(201).json({ url: blob.url });
+  }
   const folderPath = path.join(uploadsDir, folder);
   await mkdir(folderPath, { recursive: true });
   await writeFile(path.join(folderPath, filename), req.file.buffer, { flag: "wx" });
   res.status(201).json({ url: `/uploads/${folder}/${filename}` });
 }));
 
-await pool.query(await readFile(path.join(root, "server", "schema.sql"), "utf8"));
-await mkdir(uploadsDir, { recursive: true });
-const adminCount = await pool.query("SELECT count(*)::int AS count FROM admin_users");
-if (adminCount.rows[0].count === 0) {
-  const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD, 12);
-  await pool.query(
-    "INSERT INTO admin_users (email,password_hash,role) VALUES ($1,$2,'owner')",
-    [process.env.ADMIN_EMAIL.trim().toLowerCase(), passwordHash]
-  );
-  console.info("Initial owner account created from ADMIN_EMAIL.");
+let databaseInitialization;
+export function initializeDatabase() {
+  if (!databaseInitialization) {
+    databaseInitialization = (async () => {
+      await pool.query(await readFile(path.join(root, "server", "schema.sql"), "utf8"));
+      if (!process.env.VERCEL) await mkdir(uploadsDir, { recursive: true });
+      const adminCount = await pool.query("SELECT count(*)::int AS count FROM admin_users");
+      if (adminCount.rows[0].count === 0) {
+        const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD, 12);
+        await pool.query(
+          "INSERT INTO admin_users (email,password_hash,role) VALUES ($1,$2,'owner')",
+          [process.env.ADMIN_EMAIL.trim().toLowerCase(), passwordHash]
+        );
+        console.info("Initial owner account created from ADMIN_EMAIL.");
+      }
+    })();
+  }
+  return databaseInitialization;
 }
 
 const distDir = path.join(root, "dist");
-app.use("/uploads", express.static(uploadsDir, { maxAge: "1d", immutable: true }));
-app.use(express.static(distDir));
-app.get(/^(?!\/api\/).*/, asyncRoute(async (_req, res, next) => {
-  try {
-    res.sendFile(path.join(distDir, "index.html"));
-  } catch {
-    next();
-  }
-}));
+if (!process.env.VERCEL) {
+  app.use("/uploads", express.static(uploadsDir, { maxAge: "1d", immutable: true }));
+  app.use(express.static(distDir));
+  app.get(/^(?!\/api\/).*/, asyncRoute(async (_req, res, next) => {
+    try {
+      res.sendFile(path.join(distDir, "index.html"));
+    } catch {
+      next();
+    }
+  }));
+}
 
 app.use((error, _req, res, _next) => {
   if (error instanceof multer.MulterError) {
@@ -576,16 +604,23 @@ app.use((error, _req, res, _next) => {
   sendError(res, 500, "Terjadi kesalahan server.");
 });
 
-const server = app.listen(port, "0.0.0.0", () => {
-  console.info(`Portfolio API listening on port ${port}`);
-});
+export { app };
 
-async function shutdown() {
-  server.close(async () => {
-    clearInterval(rateLimitCleanup);
-    await pool.end();
-    process.exit(0);
+const isMainModule = process.argv[1]
+  && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isMainModule) {
+  await initializeDatabase();
+  const server = app.listen(port, "0.0.0.0", () => {
+    console.info(`Portfolio API listening on port ${port}`);
   });
+
+  async function shutdown() {
+    server.close(async () => {
+      clearInterval(rateLimitCleanup);
+      await pool.end();
+      process.exit(0);
+    });
+  }
+  process.on("SIGTERM", shutdown);
+  process.on("SIGINT", shutdown);
 }
-process.on("SIGTERM", shutdown);
-process.on("SIGINT", shutdown);

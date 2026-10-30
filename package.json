@@ -9,9 +9,11 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "seed:postgres": "node --experimental-strip-types scripts/seed-postgres.mjs",
-    "import:supabase": "node scripts/import-supabase-csv.mjs"
+    "import:supabase": "node scripts/import-supabase-csv.mjs",
+    "migrate:uploads": "node scripts/migrate-uploads-to-vercel-blob.mjs"
   },
   "dependencies": {
+    "@vercel/blob": "2.4.0",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "csv-parse": "^7.0.3",

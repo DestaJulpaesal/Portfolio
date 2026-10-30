@@ -1,0 +1,10 @@
+.env
+.env.*
+.env.local
+.env.*.local
+.git/
+.vscode/
+.vercel/
+uploads/
+kyousuke-homepage*.html
+*.tsbuildinfo

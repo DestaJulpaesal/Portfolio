@@ -6,3 +6,8 @@ dist-ssr
 .env
 .env.*
 !.env.example
+*.tsbuildinfo
+.vscode/
+kyousuke-homepage*.html
+uploads/
+.vercel/
