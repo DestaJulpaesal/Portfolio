@@ -72,7 +72,7 @@ export function Login() {
     <div className={styles.wrap}>
       <div className={styles.card}>
         <div className={styles.logoRow}>
-          <img src={profile.logoImage} alt="" className={styles.logo} />
+          <img src={profile.logoImage || "/logo-white.png?v=1"} alt="" className={styles.logo} />
           <div>
             <p className={styles.brand}>{profile.name}</p>
             <p className={`mono ${styles.brandTag}`}>Admin Panel</p>

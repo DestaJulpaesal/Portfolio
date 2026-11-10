@@ -36,6 +36,8 @@ export function About() {
                   src={about.photo}
                   alt={profile.name}
                   className={`${styles.photo} ${styles[`photo-${about.photoFilter ?? "natural"}`]}`}
+                  loading="lazy"
+                  decoding="async"
                 />
               ) : (
                 <div className={`mono ${styles.photoPlaceholder}`}>Foto profil</div>

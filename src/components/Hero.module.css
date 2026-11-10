@@ -318,6 +318,13 @@
   -webkit-user-drag: none;
 }
 
+.portraitFallback,
+.portraitRemote {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.25s ease;
+}
+
 .photo-warm {
   filter: sepia(0.12) saturate(1.12) drop-shadow(0 20px 70px rgba(0, 255, 173, 0.12));
 }

@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -22,6 +23,7 @@ const socialIcons = {
 
 export function Hero() {
   const { profile, loading } = useProfileContent();
+  const [loadedPhoto, setLoadedPhoto] = useState("");
   const { displayed, activeLine, done } = useTypewriter(
     [profile.name.toUpperCase(), profile.headlineAccent],
     { speed: 48, lineDelay: 220, startDelay: 250 }
@@ -31,9 +33,20 @@ export function Hero() {
     return (
       <section id="top" className={styles.hero} aria-busy="true">
         <div className={`container ${styles.loadingState}`} />
+        <div className={styles.portraitFrame} aria-hidden="true">
+          <img
+            src="/projects/hero-reference.webp"
+            alt=""
+            className={`${styles.portrait} ${styles["photo-natural"]}`}
+            fetchPriority="high"
+            decoding="async"
+          />
+        </div>
       </section>
     );
   }
+
+  const remotePhotoReady = loadedPhoto === profile.photo;
 
   return (
     <section id="top" className={styles.hero}>
@@ -110,10 +123,26 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
         >
+          {profile.photo && (
+            <img
+              src="/projects/hero-reference.webp"
+              alt=""
+              aria-hidden="true"
+              className={`${styles.portrait} ${styles["photo-natural"]} ${styles.portraitFallback}`}
+              style={{ opacity: remotePhotoReady ? 0 : 1 }}
+              decoding="async"
+              draggable={false}
+            />
+          )}
           <img
             src={profile.photo || "/projects/hero-reference.webp"}
             alt={`Potret ${profile.name}`}
-            className={`${styles.portrait} ${styles[`photo-${profile.photoFilter ?? "natural"}`]}`}
+            className={`${styles.portrait} ${styles[`photo-${profile.photoFilter ?? "natural"}`]} ${styles.portraitRemote}`}
+            style={{ opacity: profile.photo && !remotePhotoReady ? 0 : 1 }}
+            onLoad={() => setLoadedPhoto(profile.photo)}
+            fetchPriority="high"
+            loading="eager"
+            decoding="async"
             draggable={false}
           />
         </motion.div>

@@ -82,7 +82,7 @@ export function AdminLayout({ children }: PropsWithChildren) {
       <aside className={`${styles.sidebar} ${mobileOpen ? styles.sidebarOpen : ""}`}>
         <div className={styles.brand}>
           <span className={styles.brandLogoWrap}>
-            <img src={profile.logoImage} alt="" className={styles.brandLogo} />
+            <img src={profile.logoImage || "/logo-white.png?v=1"} alt="" className={styles.brandLogo} />
           </span>
           <div className={styles.brandCopy}>
             <p className={styles.brandName}>{profile.name}</p>
